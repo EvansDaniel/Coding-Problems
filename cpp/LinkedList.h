@@ -1,3 +1,4 @@
+/*
 //
 // Created by daniel on 6/13/16.
 //
@@ -17,6 +18,8 @@ public:
 
     LinkedList(const LinkedList<T> &src);
 
+    void swap(LinkedList<T>& other);
+
     ~LinkedList();
 
     T &front();
@@ -29,7 +32,8 @@ public:
 
     bool search(T data);
 
-    LinkedList &operator=(LinkedList &other); // TODO: to be implemented
+    LinkedList<T>& operator= (LinkedList<T> rhs);
+
     void pushFront(const T &);
 
     void pushBack(const T &);
@@ -41,7 +45,48 @@ public:
     void dump();
 
 private:
+
+     class const_iterator
+     {
+         public:
+         const_iterator( ) : current{ nullptr }
+         { }
+
+         const T& operator* ( ) const
+         { return retrieve( ); }
+
+         const_iterator & operator++ ( )
+         {
+             current = current->link;
+             return *this;
+             }
+
+         const_iterator operator++ ( int )
+         {
+             const_iterator old = *this;
+             ++( *this );
+             return old;
+             }
+
+
+         bool operator== ( const const_iterator & rhs ) const
+         { return current == rhs.current; }
+         bool operator!= ( const const_iterator & rhs ) const
+         { return !( *this == rhs ); }
+
+         protected:
+         Node *current;
+
+         T & retrieve( ) const
+         { return current->data; }
+
+         const_iterator( Node *p ) : current{ p }
+         { }
+
+         friend class List<Object>;
+         };
     class Node {
+
         friend class LinkedList<T>;
 
     private:
@@ -49,7 +94,7 @@ private:
         Node *link;
 
     public:
-        Node(T d, Node *n = nullptr) : data(d), link(n) { }
+        Node(T d = -1111111, Node *n = nullptr) : data(d), link(n) { }
     };
 
     Node *head;
@@ -57,8 +102,11 @@ private:
     int len;
 };
 
+
+// src = list2
 template<typename T>
 LinkedList<T>::LinkedList(const LinkedList<T> &src) {
+    std::cout << "\nCopy constructor has been called.\n\n";
     Node *curr = src.head;
     while (curr) {
         pushBack(curr->data);
@@ -79,9 +127,11 @@ LinkedList<T>::LinkedList(void) : head(nullptr),
                                   len(0) { }
 
 
+*/
 /**
  * returns lvalue reference to the head's data
- */
+ *//*
+
 template<typename T>
 T &LinkedList<T>::front() {
     assert(head != nullptr);
@@ -130,6 +180,7 @@ void LinkedList<T>::popFront() {
         head = head->link;
     }
     delete oldhead;
+    oldhead = nullptr;
     --len;
 }
 
@@ -171,6 +222,31 @@ void LinkedList<T>::pushBack(const T &d) {
     ++len;
 }
 
+template <typename T>
+void LinkedList<T>::swap(LinkedList<T>& other)
+{
+    using std::swap;
+    swap(head, other.head);
+    swap(tail, other.tail);
+    swap(len, other.len);
+}
+
+*/
+/*template <typename T>
+void swap(LinkedList<T>& a, LinkedList<T>& b)
+{
+    a.swap(b);
+}*//*
+
+
+template <typename T>
+LinkedList<T>& LinkedList<T>::operator=(LinkedList<T> rhs) {
+    std::cout << "operator equals";
+//    swap(*this, rhs);
+    swap(rhs);
+    return *this;
+}
+
 template<typename T>
 void LinkedList<T>::dump() {
     for (Node *curr = head; curr != nullptr; curr = curr->link) {
@@ -183,3 +259,4 @@ void LinkedList<T>::dump() {
 }
 
 #endif //CPPTEST_LINKEDLIST_H
+*/
