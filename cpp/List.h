@@ -250,9 +250,10 @@ public:
     iterator insert(iterator itr, Object &&x) {
         Node *p = itr.current;
         theSize++;
-        return {p->prev = p->prev->next
-                = new Node{std::move(x), p->prev, p}};
+        return p->prev = p->prev->next
+                = new Node{std::move(x), p->prev, p};
     }
+
 
     // Erase item at itr.
     iterator erase(iterator itr) {
@@ -276,7 +277,7 @@ public:
     }
 
     // allocate memory for nodes, pointers to the first node in list,
-    // set size to 0 
+    // set size to 0
     void init() {
         theSize = 0;
         head = new Node;

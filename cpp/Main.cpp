@@ -3,25 +3,36 @@
 // Created by daniel on 6/13/16.
 //
 #include <iostream>
-#include "List.h"
+#include "SinglyLinkedList.h"
 
 using namespace std;
 
 int main() {
 
-    List<int> list;
 
-    list.push_back(56);  // good
-    list.push_front(34); // good
+    SSL<int> l;
 
-    List<int> list2;
-    list2.push_back(3922);
+    l.push_back(7);
 
-    list = list2;
+//    l.print();
 
-    for (List<int>::iterator itr = list.begin(); itr != list.end(); ++itr) {
-        cout << *itr << endl;
-    }
+    l.push_front(8);
+
+    l.print();
+
+    cout << endl;
+    cout << endl;
+
+    l.erase(l.begin());
+
+//    l.erase(l.begin(),l.end());
+
+    l.push_back(45);
+    l.push_front(56);
+    l.push_back(23);
+    l.pop_front();
+
+    l.print();
 
 
 
