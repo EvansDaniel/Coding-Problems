@@ -3,21 +3,35 @@
 // Created by daniel on 6/13/16.
 //
 #include <iostream>
-#include "SinglyLinkedList.h"
+#include "Stack.h"
 
 using namespace std;
 
 int main() {
 
-    /**
+    Stack<int> stack;
+
+    stack.push(45);
+    stack.push(34);
+    stack.push(32323);
+    cout << stack.peek() << endl;
+    cout << stack.pop() << endl;
+
+    while (!stack.empty())
+        stack.pop();
+
+    cout << stack.empty() << endl;
+
+
+/*    *//**
      * push_back
      * copy ctor
      * copy-assignment
      * pop_front
      * move ctor
      * move assignment operator needs work
-     * everything else is good 
-     */
+     * everything else is good
+     *//*
 
 
     SSL<int> l;
@@ -38,7 +52,7 @@ int main() {
 
     l3.print();
 
-    SSL<int> ssl{SSL<int>(l3)};
+    SSL<int> ssl{SSL<int>(l3)};*/
 
 
 
