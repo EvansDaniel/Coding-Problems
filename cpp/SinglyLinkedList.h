@@ -23,7 +23,6 @@ private:
     };
 
     Node *head;
-    Node *tail;
     Node *sentinelNode;
     int len;
 
@@ -157,18 +156,19 @@ public:
         clear();
     }
 
-    SSL &operator=(const SSL &rhs) {
-        SSL copy{rhs};
-        std::swap(*this, copy);
-        return *this;
 
+    SSL &operator=(SSL rhs) {
+        std::swap(this->head, rhs.head);
+        std::swap(this->sentinelNode, rhs.sentinelNode);
+        std::swap(this->len, rhs.len);
+        return *this;
     }
 
     // move constructor
     // double check this constructor
-    SSL(SSL &&rhs) : len{std::move(rhs.len)}, head{std::move(rhs.head)}, tail{std::move(rhs.tail)} {
+    SSL(SSL &&rhs) : len{rhs.len}, head{std::move(rhs.head)}, sentinelNode{std::move(rhs.sentinelNode)} {
         rhs.len = 0;
-        rhs.tail = nullptr;
+        rhs.sentinelNode = nullptr;
         rhs.head = nullptr;
     }
 
@@ -176,8 +176,8 @@ public:
     SSL &operator=(SSL &&x) {
         std::swap(this->len, x.len);
         std::swap(this->head, x.head);
-        std::swap(this->tail, x.tail);
-
+        std::swap(this->sentinelNode, x.sentinelNode);
+        return *this;
     }
 
     iterator begin() {
@@ -197,7 +197,11 @@ public:
     }
 
     void clear() {
-        erase(begin());
+        for (iterator itr = begin(); len != 0;) {
+            iterator i{itr};
+            ++itr;
+            erase(i);
+        }
     }
 
     /**
@@ -227,15 +231,14 @@ public:
         return nullptr;
     }
 
-    iterator erase(iterator itrToDel) {
+    bool erase(iterator itrToDel) {
         iterator itr = begin();
-        iterator retVal = itrToDel.current->next;
         if (itr.current == itrToDel.current) {
             head->next = itr.current->next;
-            delete itr.current;
-            itr.current = nullptr;
+            delete itrToDel.current;
+            itrToDel = nullptr;
             --len;
-            return retVal;
+            return true;
         }
         for (; itr.current != sentinelNode; ++itr) {
             if (itr.current->next == itrToDel.current) {
@@ -245,10 +248,10 @@ public:
                 itr.current = nullptr;
                 delete itr.current;
                 --len;
-                return retVal;
+                return true;
             }
         }
-        return nullptr;
+        return false;
     }
 
 /*    iterator erase ( iterator from, iterator to) {
@@ -256,12 +259,13 @@ public:
             itr = erase(itr);
     }*/
 
+
     iterator end() {
-        return tail;
+        return sentinelNode;
     }
 
     const const_iterator end() const {
-        return tail;
+        return sentinelNode;
     }
 
 
