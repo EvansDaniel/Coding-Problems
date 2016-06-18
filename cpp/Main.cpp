@@ -16,7 +16,7 @@ int main() {
      * pop_front
      * move ctor
      * move assignment operator needs work
-     * everything else is good 
+     * everything else is good
      */
 
 

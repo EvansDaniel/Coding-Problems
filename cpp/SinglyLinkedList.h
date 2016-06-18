@@ -166,7 +166,7 @@ public:
 
     // move constructor
     // double check this constructor
-    SSL(SSL &&rhs) : len{rhs.len}, head{std::move(rhs.head)}, sentinelNode{std::move(rhs.sentinelNode)} {
+    SSL(SSL &&rhs) : len{std::move(rhs.len)}, head{std::move(rhs.head)}, sentinelNode{std::move(rhs.sentinelNode)} {
         rhs.len = 0;
         rhs.sentinelNode = nullptr;
         rhs.head = nullptr;
