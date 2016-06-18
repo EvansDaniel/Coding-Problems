@@ -3,45 +3,23 @@
 // Created by daniel on 6/13/16.
 //
 #include <iostream>
-#include "SinglyLinkedList.h"
+#include "Vector.h"
 
 using namespace std;
 
 int main() {
 
-    /**
-     * push_back
-     * copy ctor
-     * copy-assignment
-     * pop_front
-     * move ctor
-     * move assignment operator needs work
-     * everything else is good
+    Vector<int> v;
+    v.push_back(45);
+    v.push_back(34);
+    v.resize(30);
+    /*
+     * v.back() = 30;
+     * the above method is invalid because
+     * back() returns a const lvalue reference
      */
-
-
-    SSL<int> l;
-
-    l.print();
-
-    l.push_back(56);
-
-    SSL<int> l2 = l;
-
-    l2.print();
-
-    SSL<int> l3;
-
-    l3.push_back(45);
-
-    l3 = l2;
-
-    l3.print();
-
-    SSL<int> ssl{SSL<int>(l3)};
-
-
-
+    for (auto itr = v.begin(); itr != v.end();)
+        cout << *itr++ << endl;
 
 
 }

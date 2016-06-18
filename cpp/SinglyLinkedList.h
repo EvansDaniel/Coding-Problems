@@ -6,7 +6,6 @@
 #define CPPTEST_SSL_H
 
 #include <algorithm>
-
 template<typename T>
 class SSL {
 
