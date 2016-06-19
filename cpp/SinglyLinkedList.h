@@ -39,7 +39,7 @@ public:
             return retrieve();
         }
 
-        const_iterator &operator++(int) {
+        const_iterator operator++(int) {
             const_iterator old = *this;
             current = current->next;
             return old;
@@ -83,15 +83,15 @@ public:
             return *this;
         }
 
-        iterator &operator++(int) {
+        iterator operator++(int) {
             iterator old = *this;
             this->current = this->current->next;
             return old;
         }
 
     protected:
-        iterator(Node *p) : const_iterator{p} { };
 
+        iterator(Node *p) : const_iterator{p} { };
 
         friend class SSL<T>;
 

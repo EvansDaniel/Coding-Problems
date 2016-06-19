@@ -44,7 +44,121 @@
 template<typename Object>
 class Vector {
 public:
-    // what exactly does this explicit do?
+    //-------------------- ITERATORS -------------------------
+
+    class const_iterator {
+    public:
+        const_iterator() : index{nullptr} { };
+
+        const_iterator &operator++() {
+            ++index;
+            return *this;
+        }
+
+        const Object &operator*() const {
+            return retrieve();
+        }
+
+        const_iterator operator++(int) {
+            const_iterator old = *this;
+            ++index;
+            return old;
+        }
+
+        const_iterator &operator--() {
+            ++index;
+            return *this;
+        }
+
+        const_iterator operator--(int) {
+            const_iterator old = *this;
+            ++index;
+            return old;
+        }
+
+
+        bool operator==(const const_iterator &rhs) const {
+            return index == rhs.index;
+        }
+
+        bool operator!=(const const_iterator &rhs) const {
+            return index != rhs.index;
+        }
+
+    protected:
+        Object *index;
+
+        const_iterator(Object *i) : index{i} { };
+
+        Object &retrieve() const {
+            return *index;
+        }
+
+        friend class Vector<Object>;
+    };
+
+    class iterator : public const_iterator {
+    public:
+        iterator() { }
+
+        Object &operator*() {
+            return const_iterator::retrieve();
+        }
+
+        const Object &operator*() const {
+            return const_iterator::operator*();
+        }
+
+        iterator &operator++() {
+            this->index++;
+            return *this;
+        }
+
+        iterator operator++(int) {
+            auto old = *this;
+            this->index++;
+            return old;
+        }
+
+        iterator &operator--() {
+            this->index--;
+            return *this;
+        }
+
+        /**
+         * this operator must return an rvalue
+         * because its reference/temporary object is
+         * destroyed at the end of this function
+         *
+         * IN GENERAL: It is impossible to return an lvalue
+         * reference to a temporary object from a function for
+         * the reason above
+         */
+        iterator operator--(int) {
+            iterator old = *this;
+            this->index--;
+            return old;
+        }
+
+    protected:
+        iterator(Object *p) : const_iterator{p} { };
+
+
+        friend class Vector<Object>;
+
+    };
+
+/* explicit is used to prevent converting a random int
+   to a Vector. This wouldn't make any sense.
+
+   In the SSL class, we can make any iterator out of any Node*
+   because there is a single parameter ctor (can also work for
+   default-initialized multi-parameter ctors) at takes a Node*.
+   The compiler is allowed to do this once per parameter, and this
+   behavior makes sense given the close relationship between
+   pointers and iterators, but this behavior
+   doesn't make sense for Vector's constructor.
+*/
     explicit Vector(int initSize = 0)
             : size{initSize}, capacity{INITIAL_CAPACITY + initSize},
               objects{new Object[capacity]} { }
@@ -58,9 +172,7 @@ public:
     }
 
     Vector &operator=(const Vector &rhs) {
-
-        // need to double check that I don't need to swap
-        // the members instead of the object
+        // this works
         Vector copy{rhs};
         std::swap(*this, copy);
         return *this;
@@ -143,6 +255,12 @@ public:
         ++size;
     }
 
+    // TODO: implement this functioon
+    iterator push_back(iterator afterThis, const Object &d) {
+
+        return nullptr;
+    }
+
     /** @pop_back()
      * no need to delete anything because the value
      * at size will be either overwritten later when
@@ -168,11 +286,6 @@ public:
         return objects[size - 1];
     }
 
-    // defines a pointer to object as iterator
-    typedef Object *iterator;
-    // defines a const pointer to object as iterator
-    typedef Object *const_iterator;
-
     iterator begin() {
         return &objects[0];
     }
@@ -189,8 +302,11 @@ public:
         return &objects[size];
     }
 
+    Object &at(const Object &index) {
+        return objects[index];
+    }
+
 private:
-    // check this methods efficiency
     void reserve(int newSize) {
         capacity = newSize;
         // create new array of size newSize
