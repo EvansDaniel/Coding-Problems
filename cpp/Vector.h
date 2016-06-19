@@ -160,7 +160,7 @@ public:
    doesn't make sense for Vector's constructor.
 */
     explicit Vector(int initSize = 0)
-            : size{initSize}, capacity{INITIAL_CAPACITY + initSize},
+            : size{0}, capacity{INITIAL_CAPACITY + initSize},
               objects{new Object[capacity]} { }
 
     Vector(const Vector &rhs)
@@ -255,7 +255,7 @@ public:
         ++size;
     }
 
-    // TODO: implement this functioon
+    // TODO: implement this function
     iterator push_back(iterator afterThis, const Object &d) {
 
         return nullptr;

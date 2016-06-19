@@ -208,7 +208,8 @@ public:
      * @return iterator to the inserted node, or nullptr if the
      * the node specified by itr was not found in the list
      *
-     * if itr.current is found in the list, insert inserts a new
+     * if itr.current is found in
+     * the list, insert inserts a new
      * node before itr.current
      */
     iterator insert(iterator itr, const T &d) {
