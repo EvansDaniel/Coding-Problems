@@ -3,60 +3,75 @@
  */
 public class AOA {
 
+    static int[] bruteForceMaxSubarray(int[] a, int low, int high) {
+        int[] result = {Integer.MIN_VALUE, 0, 0};
+        for (int i = low; i < high; i++) {
+            int current_sum = 0;
+            for (int j = i; j < high; j++) {
+                current_sum += a[j];
+                if (result[0] < current_sum) {
+                    // max sum
+                    result[1] = i;
+                    // left index of max sum
+                    result[2] = j + 1;
+                    // right index of max sum
+                    result[0] = current_sum;
+                }
+            }
+        }
+        return result;
+    }
+
     // debugging needed
     static int[] findMaxCrossingSubarray(int[] a, int low, int mid, int high) {
-        int ls = -999999999;
-        int sum = 0;
-        int maxLeft = 0;
-        for (int i = mid; i >= low; --i) {
+        int sum = 0, left_sum = Integer.MIN_VALUE, right_sum = Integer.MIN_VALUE;
+        int[] result = new int[3];
+        for (int i = mid - 1; i >= low; i--) {
             sum += a[i];
-            if (sum > ls) {
-                ls = sum;
-                maxLeft = i;
+            if (sum > left_sum) {
+                left_sum = sum;
+                // left index of max value
+                result[1] = i;
             }
         }
-        int rs = -9999999;
+
         sum = 0;
-        int maxRight = 0;
-        for (int i = mid + 1; i < high; i++) {
-            sum += a[i];
-            if (sum > rs) {
-                rs = sum;
-                maxRight = i;
+
+        for (int j = mid; j < high; j++) {
+            sum += a[j];
+            if (sum > right_sum) {
+                right_sum = sum;
+                // right index of max value
+                result[2] = j + 1;
             }
         }
-        int[] maxCrossArr = new int[3];
-        maxCrossArr[0] = maxLeft;
-        maxCrossArr[1] = maxRight;
-        maxCrossArr[2] = ls + rs;
-        return maxCrossArr;
+        // the total sum
+        result[0] = left_sum + right_sum;
+        return result;
     }
 
     // need to debug -> divide and conquer for maximum sub array problem
-    static int[] findMaxSubarray(int[] a, int low, int high) {
-        if (high == low) {
-            int[] maxSubarray = new int[3];
-            maxSubarray[0] = low;
-            maxSubarray[1] = high;
-            maxSubarray[2] = a[low];
-            return maxSubarray;
+    static int[] DACMaxSubarray(int[] a, int low, int high) {
+        if (high == low + 1) {
+            int[] result = {low, high, a[low]};
+            return result;
         } else {
-            int[] rightMax;
-            int[] leftMax;
-            int[] crossMax;
-            int mid = (int) (Math.floor(low + high / 2.0));
-            leftMax = findMaxSubarray(a, low, mid);
+            int mid = (low + high) / 2;
+            int[] left = DACMaxSubarray(a, low, mid);
+            int[] right = DACMaxSubarray(a, mid, high);
+            int[] c = findMaxCrossingSubarray(a, low, mid, high);
 
-            rightMax = findMaxSubarray(a, mid + 1, high);
+            return returnMaxSubArray(left, right, c);
+        }
+    }
 
-            crossMax = findMaxCrossingSubarray(a, low, mid, high);
-
-            if (leftMax[2] >= rightMax[2] && leftMax[2] >= crossMax[2])
-                return leftMax;
-            else if (rightMax[2] >= leftMax[2] && rightMax[2] >= crossMax[2])
-                return rightMax;
-            else
-                return crossMax;
+    private static int[] returnMaxSubArray(int[] left, int[] right, int[] c) {
+        if (left[0] >= right[0] && left[0] >= c[0]) {
+            return left;
+        } else if (right[0] >= left[0] && right[0] >= c[0]) {
+            return right;
+        } else {
+            return c;
         }
     }
 
@@ -68,5 +83,18 @@ public class AOA {
             max = Math.max(max, cursum);
         }
         return max;
+    }
+
+    static int[] bruteforce_dacMaxSubArray(int[] a, int low, int high) {
+        if (high - low < 35) {
+            return bruteForceMaxSubarray(a, low, high);
+        } else {
+            int mid = (low + high) / 2;
+            int[] left = bruteforce_dacMaxSubArray(a, low, mid);
+            int[] right = bruteforce_dacMaxSubArray(a, mid, high);
+            int[] c = findMaxCrossingSubarray(a, low, mid, high);
+
+            return returnMaxSubArray(left, right, c);
+        }
     }
 }
