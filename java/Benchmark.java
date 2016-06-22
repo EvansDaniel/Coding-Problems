@@ -32,7 +32,7 @@ public class Benchmark {
 
 
         for (int i = 0; i < iters; ++i)
-            AOA.bruteForceMaxSubarray(g, 0, g.length); // -> add function here
+            MaxSubArrayProblem.bruteForceMaxSubarray(g, 0, g.length); // -> add function here
 
         // Let n == g.length
         // brute force is good for very small n (n < ~35), very bad for large n
@@ -42,7 +42,7 @@ public class Benchmark {
         time = System.currentTimeMillis();
 
         for (int i = 0; i < iters; ++i)
-            AOA.DACMaxSubarray(g, 0, g.length); // add function here
+            MaxSubArrayProblem.DACMaxSubarray(g, 0, g.length); // add function here
         // divide and conquer approach is bad (or at least worse than bf)
         // for small n (n < ~999), better for big n
         System.out.println("DAC time O(n*lg(n)): " +
@@ -51,7 +51,7 @@ public class Benchmark {
         time = System.currentTimeMillis();
 
         for (int i = 0; i < iters; ++i)
-            AOA.bruteforce_dacMaxSubArray(g, 0, g.length); // add function here
+            MaxSubArrayProblem.bruteforce_dacMaxSubArray(g, 0, g.length); // add function here
 
         System.out.println("Combo BF/DAC time: " +
                 String.valueOf(System.currentTimeMillis() - time) + " ms\n");
@@ -59,7 +59,7 @@ public class Benchmark {
         time = System.currentTimeMillis();
 
         for (int i = 0; i < iters; ++i)
-            AOA.maxSubArray(g);  // add function here
+            MaxSubArrayProblem.maxSubArray(g);  // add function here
 
         System.out.println("linear O(n) : " +
                 String.valueOf(System.currentTimeMillis() - time) + " ms\n");
