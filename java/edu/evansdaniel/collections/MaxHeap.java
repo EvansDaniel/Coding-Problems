@@ -169,9 +169,23 @@ public class MaxHeap {
         return a;
     }
 
+    /**
+     * sorts a binary max heap ascending
+     * runs in O(n*lg(n)) time
+     */
     public void heapSort() {
-
-        buildMaxHeap(heap);
+        int originalHeapSize = heapSize;
+        /**
+         * the below call to buildMaxHeap is only necessary if
+         * if the array does not already satisfy the max heap property
+         */
+        // buildMaxHeap(heap);
+        for (int i = heapSize - 1; i >= 0; --i) {
+            swap(heap, 0, i);
+            --heapSize;
+            maxHeapify(0);
+        }
+        heapSize = originalHeapSize;
     }
 
     private int[] swap(HeapData[] a, int x, int y) {
@@ -194,15 +208,11 @@ public class MaxHeap {
     public void add(HeapData data) {
         if (heapSize == heap.length)
             ensureCapacity(heap.length * 2 + 1);
-
+        // insert at heapSize index
         heap[heapSize] = data;
+        // heapSize is kept 1 in front of the valid element range
         ++heapSize;
-        // 9 - > child
-
-        // call maxHeapify on the parent of the newly added node
-        // then continue to call it on the parent of the parent of the
-        // newly added node until the loop iterates to the root
-        // this costs O(d), where d is the depth of the newly inserted node
+        // look at the definition to see what this does
         reheapify();
     }
 
@@ -213,8 +223,12 @@ public class MaxHeap {
             priority = heap[rightChild(parent(heapSize - 1))].priority;
             // otherwise it is a left child
         else
-
             priority = heap[rightChild(parent(heapSize - 1))].priority;
+
+        // call maxHeapify on the parent of the newly added node
+        // then continue to call it on the parent of the parent of the
+        // newly added node until the loop iterates to the root
+        // this costs O(d), where d is the depth of the newly inserted node
         for (int i = parent(heapSize - 1); i >= 0; i = parent(i)) {
             // if the priority of the newly added node is <= to the priority
             // of its parent node, then we can exit the loop, otherwise we
@@ -256,7 +270,6 @@ public class MaxHeap {
 
     /**
      * Removes and returns the element on the top of the heap
-     * <p>
      * Costs O(h) time, where h is the max height of the tree.
      * Equivalently, it costs lg(n) time where n = heapSize
      *

@@ -42,6 +42,13 @@ public class Main {
 
 //        MaxHeap.isMaxHeap(heap.toArray());
 
+        heap.heapSort();
+
+        for (int i = 0; i < heap.toArray().length; i++) {
+            System.out.print(heap.toArray()[i].getPriority() + "  ");
+        }
+        System.out.println();
+
 
     }
 }
