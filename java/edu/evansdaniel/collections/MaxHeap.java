@@ -169,6 +169,11 @@ public class MaxHeap {
         return a;
     }
 
+    public void heapSort() {
+
+        buildMaxHeap(heap);
+    }
+
     private int[] swap(HeapData[] a, int x, int y) {
 
         HeapData temp = a[x];
@@ -192,16 +197,36 @@ public class MaxHeap {
 
         heap[heapSize] = data;
         ++heapSize;
+        // 9 - > child
 
         // call maxHeapify on the parent of the newly added node
         // then continue to call it on the parent of the parent of the
         // newly added node until the loop iterates to the root
         // this costs O(d), where d is the depth of the newly inserted node
-        boolean done = false;
-        for (int i = parent(heapSize - 1); i >= 0 && !done; i = parent(i)) {
+        reheapify();
+    }
+
+    public void reheapify() {
+        int priority;
+        // if the newly added node has an even index, it is a rightChild
+        if ((heapSize - 1) % 2 == 0)
+            priority = heap[rightChild(parent(heapSize - 1))].priority;
+            // otherwise it is a left child
+        else
+
+            priority = heap[rightChild(parent(heapSize - 1))].priority;
+        for (int i = parent(heapSize - 1); i >= 0; i = parent(i)) {
+            // if the priority of the newly added node is <= to the priority
+            // of its parent node, then we can exit the loop, otherwise we
+            // need to reheapify using maxHeapify
+            if (priority <= heap[i].priority)
+                break;
             maxHeapify(i);
-            if (i == 0)
-                done = true;
+            // we don't need to reset the value of priority here because
+            // at this point the child node has been swapped with the parent node
+            // and maxHeapify does not change the child node's priority. Thus,
+            // all we have to do is update the i to be the index of current parent of the
+            // newly added node
         }
     }
 
@@ -243,11 +268,11 @@ public class MaxHeap {
         int top = peak();
         // swap the first element with the last
         // element in the array
-        swap(this.heap, 0, heapSize);
+        swap(this.heap, 0, heapSize - 1);
         // remove what used to be the first element
-        --heapSize;
         // restore the max heap property
-        maxHeapify(0);
+        reheapify();
+        --heapSize;
         return top;
     }
 
