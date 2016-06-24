@@ -213,34 +213,26 @@ public class MaxHeap {
         // heapSize is kept 1 in front of the valid element range
         ++heapSize;
         // look at the definition to see what this does
-        reheapify();
+        reheapify(heapSize - 1);
     }
 
-    public void reheapify() {
-        int priority;
-        // if the newly added node has an even index, it is a rightChild
-        if ((heapSize - 1) % 2 == 0)
-            priority = heap[rightChild(parent(heapSize - 1))].priority;
-            // otherwise it is a left child
-        else
-            priority = heap[rightChild(parent(heapSize - 1))].priority;
+    public void heapIncreaseKey(int index, int key) {
+        if (key < heap[index].priority)
+            throw new IllegalArgumentException("the current key: " +
+                    heap[index].priority + " is greater than the specified key: " + key);
 
-        // call maxHeapify on the parent of the newly added node
-        // then continue to call it on the parent of the parent of the
-        // newly added node until the loop iterates to the root
-        // this costs O(d), where d is the depth of the newly inserted node
-        for (int i = parent(heapSize - 1); i >= 0; i = parent(i)) {
-            // if the priority of the newly added node is <= to the priority
-            // of its parent node, then we can exit the loop, otherwise we
-            // need to reheapify using maxHeapify
-            if (priority <= heap[i].priority)
-                break;
-            maxHeapify(i);
-            // we don't need to reset the value of priority here because
-            // at this point the child node has been swapped with the parent node
-            // and maxHeapify does not change the child node's priority. Thus,
-            // all we have to do is update the i to be the index of current parent of the
-            // newly added node
+        heap[index].priority = key;
+        while (index >= 0 && heap[parent(index)].priority < heap[index].priority) {
+            swap(heap, index, parent(index));
+            index = parent(index);
+        }
+
+    }
+
+    public void reheapify(int index) {
+        while (index >= 0 && heap[parent(index)].priority < heap[index].priority) {
+            swap(heap, index, parent(index));
+            index = parent(index);
         }
     }
 
@@ -284,7 +276,7 @@ public class MaxHeap {
         swap(this.heap, 0, heapSize - 1);
         // remove what used to be the first element
         // restore the max heap property
-        reheapify();
+        reheapify(heapSize - 1);
         --heapSize;
         return top;
     }
