@@ -41,6 +41,8 @@ public class SortingUtils {
         }
     }
 
+    // http://www.java2novice.com/java-sorting-algorithms/merge-sort/
+    // good diagram at this link
     public static void ms(int[] a, int p, int r) {
         // if there is only one element in the sub array
         if (p < r) {
@@ -101,7 +103,7 @@ public class SortingUtils {
 
     // an alternative version of merge sort without using sentinel nodes
     static void merge(int A[], int p, int q, int r) {
-        int i, j, k;
+        int li, ri, k;
 
         int n1 = q - p + 1;
         int n2 = r - q;
@@ -109,20 +111,28 @@ public class SortingUtils {
         int[] L = new int[n1];
         int R[] = new int[n2];
 
-        for (i = 0; i < n1; i++)
-            L[i] = A[p + i];
-        for (j = 0; j < n2; j++)
-            R[j] = A[q + j + 1];
+        // copy the left sub array of a into L
+        for (li = 0; li < n1; li++)
+            L[li] = A[p + li];
+        // copy right sub array of a into
+        for (ri = 0; ri < n2; ri++)
+            R[ri] = A[q + ri + 1];
 
-        for (i = 0, j = 0, k = p; k <= r; k++) {
-            if (i == n1) {
-                A[k] = R[j++];
-            } else if (j == n2) {
-                A[k] = L[i++];
-            } else if (L[i] <= R[j]) {
-                A[k] = L[i++];
+        // while the index into a <= to the end of the array a (r)
+        for (li = 0, ri = 0, k = p; k <= r; k++) {
+            // if the index into the left (L) sub array is equal to L.length
+            if (li == n1) {
+                A[k] = R[ri++];
+                // if the index into the right (R) sub array is equal to R.length
+            } else if (ri == n2) {
+                A[k] = L[li++];
+                // if the current element in L is <= to the current element in R
+            } else if (L[li] <= R[ri]) {
+                // copy L's current element to A
+                A[k] = L[li++];
             } else {
-                A[k] = R[j++];
+                // copy R's element to A
+                A[k] = R[ri++];
             }
         }
     }

@@ -8,15 +8,16 @@ public class Main {
 
     public static void main(String[] args) {
 
-        HeapData[] hd = new HeapData[10];
+        HeapData[] hd = new HeapData[15];
         System.out.println("before max heap: ");
         for (int i = 0; i < hd.length; i++) {
-            hd[i] = new HeapData(i, i);
-            System.out.print(hd[i].getPriority() + "    ");
+            hd[i] = new HeapData(i, (int) Math.round(Math.random() * 100));
         }
         System.out.println();
 
-        MaxHeap heap = new MaxHeap(hd);
+        // interestingly when MaxHeap(hd,1) is called
+        // we get a sorted array descending
+        MaxHeap heap = new MaxHeap(hd, 4);
 
         hd = heap.toArray();
 
@@ -24,31 +25,13 @@ public class Main {
         for (int i = 0; i < hd.length; i++) {
             System.out.print(hd[i].getPriority() + "  ");
         }
-        System.out.println();
+        heap.setHeapChildren(2);
 
-        System.out.println(MaxHeap.isMaxHeap(hd));
+        hd = heap.toArray();
 
-        heap.add(new HeapData(3, 8));
-
-        System.out.println(MaxHeap.isMaxHeap(heap.toArray()));
-
-        heap.pop();
-
-        for (int i = 0; i < heap.toArray().length; i++) {
-            System.out.print(heap.toArray()[i].getPriority() + "  ");
+        System.out.println("Max heap: ");
+        for (int i = 0; i < hd.length; i++) {
+            System.out.print(hd[i].getPriority() + "  ");
         }
-        System.out.println();
-        System.out.println(MaxHeap.isMaxHeap(heap.toArray()));
-
-//        MaxHeap.isMaxHeap(heap.toArray());
-
-        heap.heapSort();
-
-        for (int i = 0; i < heap.toArray().length; i++) {
-            System.out.print(heap.toArray()[i].getPriority() + "  ");
-        }
-        System.out.println();
-
-
     }
 }

@@ -15,18 +15,21 @@ public class MaxHeap {
      */
     private int heapSize;
 
+    private int numChildren = 2;
+
     /**
      * array is converted to a max heap by calling
      * buildMaxHeap
      *
      * @param a any array, ordered or unordered
      */
-    public MaxHeap(HeapData[] a, int initSize) {
+    public MaxHeap(HeapData[] a, int numChildren, int initSize) {
         validateArray(a);
 
         if (initSize < 0)
             initSize = INIT_CAPACITY;
 
+        this.numChildren = numChildren;
         initHeap(a, initSize);
 
         this.heapSize = a.length;
@@ -34,45 +37,27 @@ public class MaxHeap {
         heap = buildMaxHeap(heap);
     }
 
-    public MaxHeap(HeapData[] a) {
+    public MaxHeap(HeapData[] a, int numChildren) {
         validateArray(a);
+        this.numChildren = numChildren;
         heapSize = a.length;
         initHeap(a, a.length * 2 + 1);
         heap = buildMaxHeap(heap);
     }
 
 
-    public MaxHeap(int initSize) {
+    public MaxHeap(int initSize, int numChildren) {
         if (initSize < 0)
             initSize = INIT_CAPACITY;
+
+        this.numChildren = numChildren;
         heapSize = 0;
         heap = new HeapData[initSize];
     }
 
     public MaxHeap() {
-        this(INIT_CAPACITY);
-    }
 
-    /**
-     * check if a is a max heap
-     *
-     * @param a any HeapData array
-     * @return true if a satisfies the max heap property, false if not
-     */
-    public static boolean isMaxHeap(HeapData[] a) {
-
-        for (int i = parent(a.length); i >= 0; --i) {
-            int l = leftChild(i);
-            int r = rightChild(i);
-
-            int largest = MaxHeap.largest(a, a.length, i, l, r);
-            if (largest != i)
-                return false;
-        }
-        // if we get through the loop, that means that every parent node
-        // a is >= to both its right and left child node, satisfying
-        // the max heap property
-        return true;
+        this(INIT_CAPACITY, 2);
     }
 
     /**
@@ -105,41 +90,82 @@ public class MaxHeap {
     }
 
     /**
-     * Precondition: the array must be a max heap
+     * check if a is a max heap
+     *
+     * @param a any HeapData array
+     * @return true if a satisfies the max heap property, false if not
+     */
+    public boolean isMaxHeap(HeapData[] a) {
+
+        for (int i = parent(a.length); i >= 0; --i) {
+            int l = childD(i, 1);
+            int r = childD(i, 2);
+
+            int largest = MaxHeap.largest(a, a.length, i, l, r);
+            if (largest != i)
+                return false;
+        }
+        // if we get through the loop, that means that every parent node
+        // a is >= to both its right and left child node, satisfying
+        // the max heap property
+        return true;
+    }
+
+    public void setHeapChildren(int numChildren) {
+        this.numChildren = numChildren;
+        buildMaxHeap(heap);
+    }
+
+    /**
+     * Precondition: the array must be a binary max heap
      *
      * @param i the index of the parent node of leftChild(i)
      * @return index of left child node of the node heap[i]
      */
-    static int leftChild(int i) {
-        return 2 * i + 1;
+    // if binary heap, this gets the leftChild; else it is undefined
+    public int leftChild(int i) {
+        return numChildren * i + 1;
     }
 
     /**
-     * Precondition: the array must be a max heap
+     * the d child of the node at index p
+     *
+     * @param p index of the parent node
+     * @param d the d child of the the node at index p
+     * @return the index of child d of node at index p
+     * <p>
+     * precondition: d > 0 && d <= numChildren
+     * precondition: p must be a vaild index in the array
+     */
+    public int childD(int p, int d) {
+        if (d > numChildren)
+            throw new IllegalArgumentException("d cannot be greater than" +
+                    " numChildren: d=" + d + ", numChildren=" + numChildren);
+        return p * numChildren + d;
+    }
+
+    /**
+     * Precondition: the array must be a binary max heap
      *
      * @param i the index of the parent node of leftChild(i)
      * @return index of left child node of the node heap[i]
      */
-    static int rightChild(int i) {
-        return (i + 1) * 2;
+    // if binary heap, this gets the rightChild; else it is undefined
+    int rightChild(int i) {
+        return (i + 1) * numChildren;
     }
 
-    /**
-     * Precondition: the array must be a max heap
-     *
-     * @param i index of a node that is a child of parent(i)
-     * @return parent of heap[i]
-     */
-    static int parent(int i) {
+    public int parent(int ci) {
         // the parent of nodes at indices 1 and 2 is the node at index 0
-        if (i < 3)
+        if (ci <= numChildren)
             return 0;
-        // if the node's priority is even
-        if (i % 2 == 0)
-            return (int) (Math.floor(i / 2.0) - 1);
-            // if it's odd
+        double p = ci / (numChildren * 1.0);
+        // fixes a boundary case where ci == to the numChildren child of some parent
+        // test it on a 3-ary heap with ci == 6 and this will make sense
+        if (p == Math.floor(p))
+            return (int) --p;
         else
-            return (int) Math.floor(i / 2.0);
+            return (int) Math.floor(p);
     }
 
     private void validateArray(HeapData[] a) {
@@ -294,17 +320,21 @@ public class MaxHeap {
     }
 
     private void maxHeapify(int i, HeapData[] a) {
-
-        // get indices of the left and right child
-        int l = leftChild(i);
-        int r = rightChild(i);
-
-        int largest = MaxHeap.largest(a, heapSize, i, l, r);
+        // maxCi is the index of the child with the greatest priority
+        int maxCi = i;
+        // on 1st iteration, ci is the index of the first child of
+        // of the node at index i.
+        // we can ++ci because the children of the node at index i are
+        // sequentially ordered, this prevents any kind of call to childD
+        for (int ci = childD(i, 1); ci < heapSize && ci <= childD(i, numChildren); ++ci) {
+            if ((a[ci].priority > a[maxCi].priority))
+                maxCi = ci;
+        }
 
         // if the largest is not the parent
-        if (largest != i) {
-            swap(a, i, largest);
-            maxHeapify(largest, a);
+        if (maxCi != i) {
+            swap(a, i, maxCi);
+            maxHeapify(maxCi, a);
         }
     }
 
