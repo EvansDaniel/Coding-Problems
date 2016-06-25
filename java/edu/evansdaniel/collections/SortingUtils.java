@@ -6,9 +6,10 @@ package edu.evansdaniel.collections;
 public class SortingUtils {
 
     public static void main(String[] args) {
-        int[] a = {5, 3, 6, 4, 8, 3};
-        insertionSort(a);
-        ms(a, 0, a.length - 1);
+        int[] a = {5, 3, 6, 4, 8, 3, 6, 3, 7, 22, 5, 3};
+//        insertionSort(a);
+//        ms(a, 0, a.length - 1);
+        qs(a, 0, a.length / 2);
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i] + "   ");
         }
@@ -17,7 +18,6 @@ public class SortingUtils {
     /**
      * 'new' elements are defined as a[j]
      * 'old' elements are defined as a[j-1...0]
-     *
      * @param a any array
      */
     public static void insertionSort(int[] a) {
@@ -144,5 +144,36 @@ public class SortingUtils {
             mergeSort(A, q + 1, r);
             merge(A, p, q, r);
         }
+    }
+
+    public static void qs(int[] a, int start, int end) {
+        if (start < end) {
+            int q = partition(a, start, end);
+            qs(a, start, q - 1);
+            qs(a, q + 1, end);
+        }
+    }
+
+    public static int partition(int[] a, int p, int end) {
+        int pivot = a[end];
+        int lastKnownElementLessThanPivot = p - 1;
+        for (int j = p; j < end - 1; ++j) {
+            if (a[j] <= pivot) {
+                ++lastKnownElementLessThanPivot;
+                swap(a, lastKnownElementLessThanPivot, j);
+            }
+        }
+        // swap pivot with the the element just after the last known
+        // element < than the pivot
+        swap(a, lastKnownElementLessThanPivot + 1, end);
+
+        return lastKnownElementLessThanPivot + 1;
+    }
+
+    private static void swap(int[] a, int x, int j) {
+
+        int tmp = a[x];
+        a[x] = a[j];
+        a[j] = tmp;
     }
 }
