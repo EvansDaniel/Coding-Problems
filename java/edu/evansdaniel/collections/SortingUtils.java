@@ -9,7 +9,7 @@ public class SortingUtils {
         int[] a = {5, 3, 6, 4, 8, 3, 6, 3, 7, 22, 5, 3};
 //        insertionSort(a);
 //        ms(a, 0, a.length - 1);
-        qs(a, 0, a.length / 2);
+        qs(a, 0, a.length - 1);
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i] + "   ");
         }
@@ -157,14 +157,14 @@ public class SortingUtils {
     public static int partition(int[] a, int p, int end) {
         int pivot = a[end];
         int lastKnownElementLessThanPivot = p - 1;
-        for (int j = p; j < end - 1; ++j) {
+        for (int j = p; j < end; ++j) {
             if (a[j] <= pivot) {
                 ++lastKnownElementLessThanPivot;
                 swap(a, lastKnownElementLessThanPivot, j);
             }
         }
         // swap pivot with the the element just after the last known
-        // element < than the pivot
+        // elemt
         swap(a, lastKnownElementLessThanPivot + 1, end);
 
         return lastKnownElementLessThanPivot + 1;
