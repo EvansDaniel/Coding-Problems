@@ -1,18 +1,72 @@
 package edu.evansdaniel.collections;
 
+import java.util.Random;
+
 /**
  * Created by daniel on 6/23/16.
  */
 public class SortingUtils {
 
     public static void main(String[] args) {
-        int[] a = {5, 3, 6, 4, 8, 3, 6, 3, 7, 22, 5, 3};
+        int[] a = {7, 8, 6, 10, 15, 36, 28, 68, 365, 57, 24, 1, 5, 33, 8, 2, 89, 37};
 //        insertionSort(a);
 //        ms(a, 0, a.length - 1);
-        qs(a, 0, a.length - 1);
+        a = countingSort(a);
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i] + "   ");
         }
+    }
+
+    /**
+     * @param a any array
+     * @return index of maximum element in a
+     */
+    private static int max(int[] a) {
+        int maxI = 0;
+        for (int i = 1; i < a.length; i++) {
+            if (a[maxI] < a[i])
+                maxI = i;
+        }
+        return maxI;
+    }
+
+    /**
+     * @param a any array
+     * @return sorted array
+     */
+    public static int[] countingSort(int[] a) {
+        // get the max element in a, add one to prevent arrayIndexOutOfBounds
+        int maxInA = a[max(a)] + 1;
+
+        // count: array that will contain the # of times a[k] appears in
+        // array a, where 0 <= k <= a.length
+        int[] count = new int[maxInA];
+        // sorted: the array returned after building the sorted version of a
+        int[] sorted = new int[a.length];
+
+        // count the number of times the values in a appear in a
+        // record them in count at index valueInA
+        for (int valueInA : a) {
+            ++count[valueInA];
+        }
+        /**
+         * starts at i = 1 because it adds count[i-1], count[0] will have nothing added to it
+         */
+        for (int i = 1; i < count.length; ++i) {
+            // add the previous element in count to the current
+            count[i] += count[i - 1];
+            // count[i]: # of elements <= to i
+        }
+        for (int j = a.length - 1; j >= 0; --j) {
+            // put element a[j] at the index in sorted = to
+            // the (# of elements-1) in a that are less than a[j]
+            sorted[count[a[j]] - 1] = a[j];
+
+            // if there are subsequent elements in a = to a[j] this will
+            // cause them to placed at count[a[j]-1, 1 behind where a[j] was placed
+            count[a[j]] = count[a[j]] - 1; // > 0 if there is more than 1 element in a = to a[j]
+        }
+        return sorted;
     }
 
     /**
@@ -146,26 +200,78 @@ public class SortingUtils {
         }
     }
 
+
+    /**
+     * One common approach is the median-of-3 method: choose
+     * the pivot as the median (middle element) of a set of 3 elements randomly selected
+     * from the subarray
+     *
+     * @param a     any array
+     * @param start start index into the array
+     * @param end   end index into the array
+     */
     public static void qs(int[] a, int start, int end) {
         if (start < end) {
-            int q = partition(a, start, end);
+            int q = randPartition(a, start, end);
             qs(a, start, q - 1);
             qs(a, q + 1, end);
         }
     }
 
+    public static int randPartition(int[] a, int start, int end) {
+        Random r = new Random();
+//        int pivot = start + r.nextInt(end-start+1);
+        // the formula: start + Math.floor(Math.random()*(end-start+1))
+        // ensures we end up in the range [start,end]
+        // take the case of start = 9, end = 11 -> range = [9,11]
+        // that is, 9 + floor((0.0 - .9999) * (11-9+1  == 3),
+        // which boils down to 9 + (0-2)
+        int pivot = (int) (start + Math.floor(Math.random() * (end - start + 1)));
+        swap(a, pivot, end);
+        return partition(a, start, end);
+    }
+
+    /**
+     * Loop Invariant:
+     * At the beginning of each iteration of the loop of lines 3–6, for any array
+     * index k,
+     * if k is less than the lastKnownElementLessThanPivot, its value is less than the pivot
+     * 1. If p <= k <= lastKnownElementLessThanPivot, then a[k] <= x.
+     * <p>
+     * if k is greater than the lastKnownElementLessThanPivot, then its value is
+     * > than the pivot element
+     * 2. If lastKnownElementLessThanPivot + 1 <= k <= j - 1, then a[k] > x.
+     * <p>
+     * if k is = to the index of x, then k's value is = to x
+     * 3. If k = end, then A[k] = x.
+     *
+     * @param a   any array
+     * @param p   start index
+     * @param end end index
+     * @return the index of the pivot element
+     */
     public static int partition(int[] a, int p, int end) {
+        // pivot is the element that is being compared against;
+        // a good pivot will split the array in half
         int pivot = a[end];
         int lastKnownElementLessThanPivot = p - 1;
-        for (int j = p; j < end; ++j) {
+        // j represents the current element that is being iterated through
+        int j;
+        for (j = p; j < end; ++j) {
+            // to sort in decreasing order, flip the >= sign to <=
             if (a[j] <= pivot) {
+                // increment the last known element
                 ++lastKnownElementLessThanPivot;
+                // swap that value with the current element
                 swap(a, lastKnownElementLessThanPivot, j);
             }
         }
         // swap pivot with the the element just after the last known
-        // elemt
+        // element less than the pivot
         swap(a, lastKnownElementLessThanPivot + 1, end);
+        // if all the elements in a are equal
+        if (lastKnownElementLessThanPivot == j)
+            return (int) Math.floor((p + end) / 2);
 
         return lastKnownElementLessThanPivot + 1;
     }
@@ -175,5 +281,76 @@ public class SortingUtils {
         int tmp = a[x];
         a[x] = a[j];
         a[j] = tmp;
+    }
+
+    private static void swap(Interval[] a, int x, int j) {
+
+        Interval tmp = a[x];
+        a[x] = a[j];
+        a[j] = tmp;
+    }
+
+    // TODO: p. 189 fuzzy sorting
+    // TODO: fix fuzzy sort
+    public static void fuzzySort(Interval[] a, int start, int end) {
+        if (start < end) {
+            Interval pivot = fuzzyPartition(a, start, end);
+            fuzzySort(a, start, pivot.left);
+            fuzzySort(a, pivot.right, end);
+        }
+    }
+
+    // TODO: fix fuzzy partition
+    private static Interval fuzzyPartition(Interval[] a, int start, int end) {
+
+        // Pick a random interval as a pivot
+        int pivot = (int) (start + Math.floor(Math.random() * (end - start + 1)));
+        swap(a, pivot, end);
+        Interval intersection = a[end];
+
+        // Find an intersection of the pivot and other intervals
+        for (int i = start; i < end; ++i) {
+            // a.left <= b.right && b.left <= a.right;
+            if (intersects(intersection, a[i])) {
+                // get rid of ifs ??? always true ????
+                if (a[i].left > intersection.left)
+                    intersection.left = a[i].left;
+                if (a[i].right < intersection.right)
+                    intersection.right = a[i].right;
+            }
+        }
+        int s;
+        for (int i = s = start; i < end; ++i) {
+            if (before(a[i], intersection)) {
+                swap(a, i, intersection);
+                ++s;
+            }
+        }
+        swap(a, end, s);
+        int t, i;
+        // Group intervals including the intersection
+        for (t = s + 1, i = end; t <= i; ) {
+            if (intersects(a[i], intersection)) {
+                swap(a, t, i);
+                ++t;
+            } else {
+                --i;
+            }
+        }
+
+        return new Interval(s, t + 1);
+    }
+
+    private static boolean before(Interval a, Interval b) {
+        return a.left <= b.right && b.left <= a.right;
+    }
+
+    private static void swap(Interval[] a, int i, Interval intersection) {
+
+    }
+
+    private static boolean intersects(Interval a, Interval b) {
+
+        return a.left <= b.right && b.left <= a.right;
     }
 }
