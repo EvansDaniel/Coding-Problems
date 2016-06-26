@@ -1,6 +1,9 @@
 package edu.evansdaniel.collections;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by daniel on 6/23/16.
@@ -9,14 +12,74 @@ public class SortingUtils {
 
     public static void main(String[] args) {
 
-        int[] a = {7, 7, 8, 6, 10, 10, 15};
+        int[] a = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
-//        insertionSort(a);
-//        ms(a, 0, a.length - 1);
-//        a = countingSort(a);
-        System.out.println(numElementsInRange(a, 6, 15));
+//          ms(a,0,a.length-1);
+        bucketSort(a);
+//        System.out.println(numElementsInRange(a, 6, 15));
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i] + "   ");
+        }
+    }
+
+    private static double[] makeSmallArrayValues(int[] a, int maxInA) {
+        double[] b = new double[a.length];
+        for (int i = 0; i < a.length; i++) {
+            b[i] = a[i] / ((1.0 * maxInA) + 1);
+            // b[i] is not [0...1)
+        }
+        Collections.shuffle(Arrays.asList(b));
+        return b;
+    }
+
+    private static void bucketSort_mapToTempList(List<List<Double>> temp,
+                                                 double[] b, int[] a) {
+        // get temp's (Math.floor(a.length * b[i])th list
+        // and add b[i] to its front
+        for (int i = 0; i < a.length; i++) {
+            temp.get((int) Math.floor(a.length * b[i])).add(0, b[i]);
+        }
+    }
+
+    private static void sortListsInTempList(int[] a, List<List<Double>> temp) {
+        for (int i = 0; i < a.length; i++) {
+            // sort temp's ith list
+            insertionSort(temp.get(i));
+        }
+    }
+
+    /**
+     *
+     * @param a an array whose elements are in the half-open interval [0-1)
+     *          and are uniformly and independently distributed across the
+     *          its indices
+     */
+    // int[] a = {7, 7, 8, 6, 10, 10, 15};
+    public static void bucketSort(int[] a) {
+        int maxInA = a[max(a)];
+        double[] b = makeSmallArrayValues(a, maxInA);
+        // list of lists
+        List<List<Double>> temp = new ArrayList<>(a.length);
+
+        // temps arraylists are initialized
+        for (int i = 0; i < a.length; i++) {
+            temp.add(new ArrayList<>(5));
+        }
+
+        bucketSort_mapToTempList(temp, b, a);
+
+        sortListsInTempList(a, temp);
+
+        int x = 0;
+        // loop through temp's length
+        for (int i = 0; i < a.length; i++) {
+            // loop through the size of each of temp's lists
+            for (int j = 0; j < temp.get(i).size(); j++) {
+                // put temp's list's elements at x
+                // convert elemnts in the list back to what they originally were
+                a[x] = (int) Math.round((maxInA + 1) * temp.get(i).get(j));
+                ++x;
+            }
         }
     }
 
@@ -135,41 +198,70 @@ public class SortingUtils {
         }
     }
 
-    // http://www.java2novice.com/java-sorting-algorithms/merge-sort/
-    // good diagram at this link
-    public static void ms(int[] a, int p, int r) {
-        // if there is only one element in the sub array
-        if (p < r) {
-            int q = (int) Math.floor((p + r) / 2.0);
-            // call mergesort on the left sub array
-            ms(a, p, q);
-            // call mergesort on the right sub array
-            ms(a, q + 1, r);
-            // call merge on the sub arrays
-            m(a, p, q, r);
+    public static void insertionSort(double[] a) {
+        for (int j = 1; j < a.length; ++j) {
+            // save value of 'new' element
+            double key = a[j];
+
+            int i = j - 1;
+            // loop through the 'old' indices
+            while (i >= 0 && a[i] > key) {
+                // make the next element be the current element, i.e. shift the
+                // current element over; this is okay because we have saved the
+                // value of the 'new' index in key
+                a[i + 1] = a[i];
+                // decrement i, will make it to -1
+                --i;
+            }
+            // will 'insert' the 'new' element either at the beginning or
+            // at the point where the key is greater than a[i]
+            a[i + 1] = key;
         }
     }
 
-    public static void m(int[] a, int p, int q, int r) {
+    public static void insertionSort(List<Double> al) {
+        double[] a = new double[al.size()];
+        for (int i = 0; i < al.size(); i++) {
+            a[i] = al.get(i);
+        }
+        insertionSort(a);
+    }
+
+    // http://www.java2novice.com/java-sorting-algorithms/merge-sort/
+    // good diagram at this link
+    public static void ms(int[] a, int start, int end) {
+        // if there is not only one element in the sub array
+        if (start < end) {
+            int mid = (int) Math.floor((start + end) / 2.0);
+            // call mergesort on the left sub array
+            ms(a, start, mid);
+            // call mergesort on the right sub array
+            ms(a, mid + 1, end);
+            // call merge on the sub arrays -> sorts the sub arrays
+            m(a, start, mid, end);
+        }
+    }
+
+    public static void m(int[] a, int start, int mid, int end) {
         // compute length of left sub array
         // n1 = 1
-        int n1 = q - p + 1;
+        int leftLength = mid - start + 1;
         // compute length of right sub array
         // n2 = 1
-        int n2 = r - q;
+        int rightLength = end - mid;
 
         // + 1 because of the sentinel values added below
-        int[] left = new int[n1 + 1];
-        int[] right = new int[n2 + 1];   // both are 2 element arrays
+        int[] left = new int[leftLength + 1];
+        int[] right = new int[rightLength + 1];
 
-        // copy a[p]-a[n1-1] into left
-        System.arraycopy(a, p, left, 0, n1);
+        // copy a[start]-a[n1-1] into left
+        System.arraycopy(a, start, left, 0, leftLength);
         // copy a[q]-a[n2-1] into right
-        System.arraycopy(a, q + 1, right, 0, n2);
+        System.arraycopy(a, mid + 1, right, 0, rightLength);
 
         // sentinel values for the left and right array
-        left[n1] = Integer.MAX_VALUE;
-        right[n2] = Integer.MAX_VALUE;
+        left[leftLength] = Integer.MAX_VALUE;
+        right[rightLength] = Integer.MAX_VALUE;
 
         // keeps track of the index into left
         int li = 0;
@@ -181,11 +273,11 @@ public class SortingUtils {
         // so that as we iterate over them, we know that a[p...k-1]
         // contains the smallest elements from the left[0...n1] and
         // right[0...n2] in sorted order
-        for (int cpyArrayIndex = p; cpyArrayIndex <= r; ++cpyArrayIndex) {
+        for (int cpyArrayIndex = start; cpyArrayIndex <= end; ++cpyArrayIndex) {
             // copy the smaller current element in the left or right sub array
             // into a and increment that arrays index (either ri or li
             // if left's current value is less than right's curr value
-            if (left[li] <= right[ri]) {
+            if (left[li] <= right[ri]) {  // when li == left.length-1, left[li] == infinity
                 a[cpyArrayIndex] = left[li];
                 ++li;
             } else {
@@ -196,24 +288,24 @@ public class SortingUtils {
     }
 
     // an alternative version of merge sort without using sentinel nodes
-    static void merge(int A[], int p, int q, int r) {
+    static void merge(int A[], int start, int mid, int end) {
         int li, ri, k;
 
-        int n1 = q - p + 1;
-        int n2 = r - q;
+        int n1 = mid - start + 1;
+        int n2 = end - mid;
 
         int[] L = new int[n1];
         int R[] = new int[n2];
 
         // copy the left sub array of a into L
         for (li = 0; li < n1; li++)
-            L[li] = A[p + li];
+            L[li] = A[start + li];
         // copy right sub array of a into
         for (ri = 0; ri < n2; ri++)
-            R[ri] = A[q + ri + 1];
+            R[ri] = A[mid + ri + 1];
 
         // while the index into a <= to the end of the array a (r)
-        for (li = 0, ri = 0, k = p; k <= r; k++) {
+        for (li = 0, ri = 0, k = start; k <= end; k++) {
             // if the index into the left (L) sub array is equal to L.length
             if (li == n1) {
                 A[k] = R[ri++];
@@ -240,7 +332,6 @@ public class SortingUtils {
         }
     }
 
-
     /**
      * One common approach is the median-of-3 method: choose
      * the pivot as the median (middle element) of a set of 3 elements randomly selected
@@ -252,14 +343,13 @@ public class SortingUtils {
      */
     public static void qs(int[] a, int start, int end) {
         if (start < end) {
-            int q = randPartition(a, start, end);
-            qs(a, start, q - 1);
-            qs(a, q + 1, end);
+            int mid = randPartition(a, start, end);
+            qs(a, start, mid - 1);
+            qs(a, mid + 1, end);
         }
     }
 
     public static int randPartition(int[] a, int start, int end) {
-        Random r = new Random();
 //        int pivot = start + r.nextInt(end-start+1);
         // the formula: start + Math.floor(Math.random()*(end-start+1))
         // ensures we end up in the range [start,end]
@@ -297,6 +387,7 @@ public class SortingUtils {
         int lastKnownElementLessThanPivot = p - 1;
         // j represents the current element that is being iterated through
         int j;
+        // NOTE: on the first recursion into partition end == a.length-2
         for (j = p; j < end; ++j) {
             // to sort in decreasing order, flip the >= sign to <=
             if (a[j] <= pivot) {
@@ -392,5 +483,20 @@ public class SortingUtils {
     private static boolean intersects(Interval a, Interval b) {
 
         return a.left <= b.right && b.left <= a.right;
+    }
+
+    /**
+     * version of bucket sort that can take any array
+     *
+     * @param a any array
+     * @return nothing
+     */
+    public void bs(int[] a) {
+
+    }
+
+    public int[] radixSort(int a[], int d) {
+
+        return null;
     }
 }
