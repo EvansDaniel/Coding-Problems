@@ -1,8 +1,6 @@
 package edu.evansdaniel.collections;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -10,75 +8,56 @@ import java.util.List;
  */
 public class SortingUtils {
 
+    private static final int BUCKET_SIZE = 5;
+
     public static void main(String[] args) {
 
-        int[] a = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+        Integer[] a = {434, 34234, 34, 34, 3, 2, 64, 1, 123, 213, 300, 400, 5300, 600, 700, 800, 900, 1000};
 
 //          ms(a,0,a.length-1);
-        bucketSort(a);
+        sort(a, BUCKET_SIZE);
 //        System.out.println(numElementsInRange(a, 6, 15));
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i] + "   ");
         }
     }
 
-    private static double[] makeSmallArrayValues(int[] a, int maxInA) {
-        double[] b = new double[a.length];
-        for (int i = 0; i < a.length; i++) {
-            b[i] = a[i] / ((1.0 * maxInA) + 1);
-            // b[i] is not [0...1)
+    public static void sort(Integer[] array, int bucketSize) {
+        if (array.length == 0) {
+            return;
         }
-        Collections.shuffle(Arrays.asList(b));
-        return b;
-    }
-
-    private static void bucketSort_mapToTempList(List<List<Double>> temp,
-                                                 double[] b, int[] a) {
-        // get temp's (Math.floor(a.length * b[i])th list
-        // and add b[i] to its front
-        for (int i = 0; i < a.length; i++) {
-            temp.get((int) Math.floor(a.length * b[i])).add(0, b[i]);
-        }
-    }
-
-    private static void sortListsInTempList(int[] a, List<List<Double>> temp) {
-        for (int i = 0; i < a.length; i++) {
-            // sort temp's ith list
-            insertionSort(temp.get(i));
-        }
-    }
-
-    /**
-     *
-     * @param a an array whose elements are in the half-open interval [0-1)
-     *          and are uniformly and independently distributed across the
-     *          its indices
-     */
-    // int[] a = {7, 7, 8, 6, 10, 10, 15};
-    public static void bucketSort(int[] a) {
-        int maxInA = a[max(a)];
-        double[] b = makeSmallArrayValues(a, maxInA);
-        // list of lists
-        List<List<Double>> temp = new ArrayList<>(a.length);
-
-        // temps arraylists are initialized
-        for (int i = 0; i < a.length; i++) {
-            temp.add(new ArrayList<>(5));
+        // TODO: abstract to the max method
+        // Determine minimum and maximum values
+        Integer minValue = array[0];
+        Integer maxValue = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < minValue) {
+                minValue = array[i]; // x
+            } else if (array[i] > maxValue) {
+                maxValue = array[i];
+            }
         }
 
-        bucketSort_mapToTempList(temp, b, a);
+        // Initialise buckets
+        int bucketCount = (maxValue - minValue) / bucketSize + 1;  // x
+        List<List<Integer>> buckets = new ArrayList<List<Integer>>(bucketCount);
+        for (int i = 0; i < bucketCount; i++) {
+            buckets.add(new ArrayList<Integer>());
+        }
 
-        sortListsInTempList(a, temp);
+        // Distribute input array values into buckets
+        for (int i = 0; i < array.length; i++) {
+            buckets.get((array[i] - minValue/*  x  */) / bucketSize).add(array[i]);
+        }
 
-        int x = 0;
-        // loop through temp's length
-        for (int i = 0; i < a.length; i++) {
-            // loop through the size of each of temp's lists
-            for (int j = 0; j < temp.get(i).size(); j++) {
-                // put temp's list's elements at x
-                // convert elemnts in the list back to what they originally were
-                a[x] = (int) Math.round((maxInA + 1) * temp.get(i).get(j));
-                ++x;
+        // Sort buckets and place back into input array
+        int currentIndex = 0;
+        for (int i = 0; i < buckets.size(); i++) {
+            Integer[] bucketArray = new Integer[buckets.get(i).size()]; // x
+            bucketArray = buckets.get(i).toArray(bucketArray); // x
+            insertionSort(bucketArray); // x
+            for (int j = 0; j < bucketArray.length; j++) {
+                array[currentIndex++] = bucketArray[j];
             }
         }
     }
@@ -177,7 +156,7 @@ public class SortingUtils {
      * 'old' elements are defined as a[j-1...0]
      * @param a any array
      */
-    public static void insertionSort(int[] a) {
+    public static void insertionSort(Integer[] a) {
         for (int j = 1; j < a.length; ++j) {
             // save value of 'new' element
             int key = a[j];
