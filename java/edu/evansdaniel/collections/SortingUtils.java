@@ -12,17 +12,17 @@ public class SortingUtils {
 
     public static void main(String[] args) {
 
-        Integer[] a = {434, 34234, 34, 34, 3, 2, 64, 1, 123, 213, 300, 400, 5300, 600, 700, 800, 900, 1000};
+        int[] a = {434, 34234, 34, 34, 3, 2, 64, 1, 123, 213, 300, 400, 5300, 600, 700, 800, 900, 1000};
 
 //          ms(a,0,a.length-1);
-        sort(a, BUCKET_SIZE);
+        bucketSort(a, BUCKET_SIZE);
 //        System.out.println(numElementsInRange(a, 6, 15));
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i] + "   ");
         }
     }
 
-    public static void sort(Integer[] array, int bucketSize) {
+    public static void bucketSort(int[] array, int bucketSize) {
         if (array.length == 0) {
             return;
         }
@@ -40,9 +40,9 @@ public class SortingUtils {
 
         // Initialise buckets
         int bucketCount = (maxValue - minValue) / bucketSize + 1;  // x
-        List<List<Integer>> buckets = new ArrayList<List<Integer>>(bucketCount);
+        List<List<Integer>> buckets = new ArrayList<>(bucketCount);
         for (int i = 0; i < bucketCount; i++) {
-            buckets.add(new ArrayList<Integer>());
+            buckets.add(new ArrayList<>());
         }
 
         // Distribute input array values into buckets
