@@ -8,10 +8,13 @@ import java.util.Random;
 public class SortingUtils {
 
     public static void main(String[] args) {
-        int[] a = {7, 8, 6, 10, 15, 36, 28, 68, 365, 57, 24, 1, 5, 33, 8, 2, 89, 37};
+
+        int[] a = {7, 7, 8, 6, 10, 10, 15};
+
 //        insertionSort(a);
 //        ms(a, 0, a.length - 1);
-        a = countingSort(a);
+//        a = countingSort(a);
+        System.out.println(numElementsInRange(a, 6, 15));
         for (int i = 0; i < a.length; i++) {
             System.out.print(a[i] + "   ");
         }
@@ -64,9 +67,46 @@ public class SortingUtils {
 
             // if there are subsequent elements in a = to a[j] this will
             // cause them to placed at count[a[j]-1, 1 behind where a[j] was placed
-            count[a[j]] = count[a[j]] - 1; // > 0 if there is more than 1 element in a = to a[j]
+            --count[a[j]]; // > 0 if there is more than 1 element in a = to a[j]
         }
         return sorted;
+    }
+
+    public static int[] numElementsLessThanI(int[] a) {
+        int maxInA = a[max(a)] + 1;
+
+        // count: array that will contain the # of times a[k] appears in
+        // array a, where 0 <= k <= a.length
+        int[] count = new int[maxInA];
+        // sorted: the array returned after building the sorted version of a
+        int[] sorted = new int[a.length];
+
+        // count the number of times the values in a appear in a
+        // record them in count at index valueInA
+        for (int valueInA : a) {
+            ++count[valueInA];
+        }
+        /**
+         * starts at i = 1 because it adds count[i-1], count[0] will have nothing added to it
+         */
+        for (int i = 1; i < count.length; ++i) {
+            // add the previous element in count to the current
+            count[i] += count[i - 1];
+            // count[i]: # of elements <= to i
+        }
+        return count;
+    }
+
+    // counts the number of elements in array that are in the range [start to end]
+    public static int numElementsInRange(int[] array, int start, int end) {
+        // provide an index h into a, and you will get the
+        // number of elements less than h
+        int[] a = numElementsLessThanI(array);
+        int num = 0;
+        // if start is an element of array, add one to the total
+        if (a[start - 1] < a[start])
+            ++num;
+        return num += (a[end] - a[start]);
     }
 
     /**
