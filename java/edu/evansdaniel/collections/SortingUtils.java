@@ -8,17 +8,96 @@ import java.util.List;
  */
 public class SortingUtils {
 
+    // TODO: WORK ON K - SORTED ARRAYS LATER
+
     private static final int BUCKET_SIZE = 5;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
-        int[] a = {434, 34234, 34, 34, 3, 2, 64, 1, 123, 213, 300, 400, 5300, 600, 700, 800, 900, 1000};
+        int[] a = {5, 9, 1, 5, 6, 7, 8, 9, 3, 4, 5, 6};
+        int[] b = {800, 34234, 434, 900, 1000};
+//        arrayShuffle(a);
+        arrayShuffle(b);
 
-//          ms(a,0,a.length-1);
-        bucketSort(a, BUCKET_SIZE);
-//        System.out.println(numElementsInRange(a, 6, 15));
+        k_sort(a, 4);
         for (int i = 0; i < a.length; i++) {
-            System.out.print(a[i] + "   ");
+            System.out.print(a[i] + " ");
+        }
+        System.out.println();
+        for (int i = 0; i < a.length; i++) {
+            //System.out.print(b[i] + " ");
+        }
+    }
+
+    // TODO: bug when a.length >= 3*k
+    public static void k_sort(int[] a, int k) {
+        for (int i = 0; i < k; i++) {
+            merge_sort(a, 0, a.length, k, i);
+        }
+    }
+
+    private static void merge_sort(int[] a, int start, int end, int k, int i) {
+        if (count(start, end, k, i) > 1) {
+            int mid = (start + end) / 2;
+            merge_sort(a, start, mid, k, i);
+            merge_sort(a, mid, end, k, i);
+            merge(a, start, mid, end, k, i);
+        }
+    }
+
+    private static int count(int start, int end, int k, int i) {
+        // a, b, k, s
+        return ((end - start) / k + (((i - start % k) + k) % k
+                < (end - start) % k ? 1 : 0));
+    }
+
+    private static void merge(int[] a, int start, int mid, int end, int k, int i) {
+        // compute left's and right's length,
+        // that is, the length of the left and right partitions of a
+        int leftLength = count(start, mid, k, i);
+        int rightLength = count(mid, end, k, i);
+
+        int[] left = new int[leftLength];
+        int[] right = new int[rightLength];
+        // copy the left partition of a into right
+        for (int p = first(start, k, i), j = 0; p < mid; p += k, ++j) {
+            left[j] = a[p];
+        }
+        System.out.println();
+        // copy the right partition of a into right
+        for (int p = first(mid, k, i), j = 0; p < end; p += k, ++j) {
+            right[j] = a[p];
+        }
+        for (int l = 0, r = 0, z = first(start, k, i); z < end; z += k) {
+            if (l == leftLength)
+                // copy the right, increment r
+                a[z] = right[r++];
+            else if (r == rightLength)
+                // copy left, increment l
+                a[z] = left[l++];
+            else if (left[l] <= right[r])
+                // copy left's next value
+                a[z] = left[l++];
+            else
+                // copy right's next value
+                a[z] = right[r++];
+        }
+    }
+
+    // i represents the kth array
+    // k represents the # of arrays merge sort will be called on
+    private static int first(int start, int k, int i) {
+        // index, k, s
+        return (start + i * -start % k + (start % k <= i ? 0 : k));
+    }
+
+    public static void arrayShuffle(int[] a) {
+        for (int i = 0; i < a.length; ) {
+            int index = (int) Math.floor(Math.random() * a.length);
+            if (index != i) {
+                swap(a, index, 0);
+                ++i;
+            }
         }
     }
 
@@ -28,8 +107,8 @@ public class SortingUtils {
         }
         // TODO: abstract to the max method
         // Determine minimum and maximum values
-        Integer minValue = array[0];
-        Integer maxValue = array[0];
+        int minValue = array[0];
+        int maxValue = array[0];
         for (int i = 1; i < array.length; i++) {
             if (array[i] < minValue) {
                 minValue = array[i]; // x
@@ -39,7 +118,7 @@ public class SortingUtils {
         }
 
         // Initialise buckets
-        int bucketCount = (maxValue - minValue) / bucketSize + 1;  // x
+        int bucketCount = (maxValue - minValue) / bucketSize + 1;
         List<List<Integer>> buckets = new ArrayList<>(bucketCount);
         for (int i = 0; i < bucketCount; i++) {
             buckets.add(new ArrayList<>());
@@ -47,7 +126,7 @@ public class SortingUtils {
 
         // Distribute input array values into buckets
         for (int i = 0; i < array.length; i++) {
-            buckets.get((array[i] - minValue/*  x  */) / bucketSize).add(array[i]);
+            buckets.get((array[i] - minValue) / bucketSize).add(array[i]);
         }
 
         // Sort buckets and place back into input array
@@ -56,6 +135,7 @@ public class SortingUtils {
             Integer[] bucketArray = new Integer[buckets.get(i).size()]; // x
             bucketArray = buckets.get(i).toArray(bucketArray); // x
             insertionSort(bucketArray); // x
+
             for (int j = 0; j < bucketArray.length; j++) {
                 array[currentIndex++] = bucketArray[j];
             }
@@ -112,6 +192,89 @@ public class SortingUtils {
             --count[a[j]]; // > 0 if there is more than 1 element in a = to a[j]
         }
         return sorted;
+    }
+
+    /**
+     * Given two arrays, reds and blues, this algorithm will pair them
+     * in their respective arrays. That is, if reds[i] == blue[h], the
+     * algorithm moves blues[h] to blues[i] in the blues array
+     *
+     * @param reds  an array of red jugs
+     * @param blues an array of blue jugs
+     */
+    public static void jugSort(int[] reds, int[] blues) {
+        if (reds.length != blues.length)
+            return;
+
+        int i = -1;
+        int j = 0;
+        for (int k = 0; k < reds.length; ++k) {
+            for (; j < blues.length; ++j) {
+                if (reds[k] == blues[j]) {
+                    ++i;
+                    swap(blues, j, i);
+                    j = i + 1;
+                    break;
+                }
+            }
+        }
+    }
+
+
+    public static void quick_jugSort(int[] reds, int[] blues, int start, int end) {
+        if (start < end) {
+            int mid = jugSort_partition(reds, blues, start, end);
+            // quick sort the left partition
+            quick_jugSort(reds, blues, start, mid);
+            // quick sort the right partition
+            quick_jugSort(reds, blues, mid + 1, end);
+        }
+    }
+
+    public static int jugSort_partition(int[] red, int[] blue, int start, int end) {
+        // compute a random redPivot index
+        int pivot = (int) (start + Math.floor(Math.random() * (end - start + 1)));
+        // swap the pivot index with the end
+        swap(red, pivot, end);
+        // save end value in redPivot
+        int redPivot = red[end];
+
+        // find the blue pivot
+        for (int i = start; i < blue.length; i++) {
+            if (redPivot == blue[i]) {
+                // when we find the value in blue = to redPivot
+                // swap it with the end index of blue
+                swap(blue, i, end);
+                break;
+            }
+        }
+        pivot = start;
+        // situate the values of blue less than redPivot
+        // before redPivot -> these values take up 0-bluePivot's index-1
+        for (int i = start; i < end; ++i) {
+            if (redPivot > blue[i]) {
+                swap(blue, pivot, i);
+                ++pivot;
+            }
+        }
+        // put the blue pivot in place all values
+        // in blue less than bluePivot are to bluePivot's left
+        swap(blue, pivot, end);
+        int bluePivot = blue[pivot]; // taking his word for it
+
+        int j = start;
+        // put the values in red less than blue pivot
+        // behind where the red pivot will be placed
+        for (int i = start; i < end; i++) {
+            if (red[i] < bluePivot) {
+                swap(red, j, i);
+                ++j;
+            }
+        }
+        // place the red pivot just in front of the values less than it
+        swap(red, end, j);
+
+        return pivot;
     }
 
     public static int[] numElementsLessThanI(int[] a) {
@@ -198,7 +361,7 @@ public class SortingUtils {
         }
     }
 
-    public static void insertionSort(List<Double> al) {
+    public static void insertionSort(List<Integer> al) {
         double[] a = new double[al.size()];
         for (int i = 0; i < al.size(); i++) {
             a[i] = al.get(i);
@@ -462,6 +625,16 @@ public class SortingUtils {
     private static boolean intersects(Interval a, Interval b) {
 
         return a.left <= b.right && b.left <= a.right;
+    }
+
+    private int nthDigit(int number, int digit) {
+        int magnitude = (int) Math.pow(10, digit);
+
+        return (number / magnitude) % 10;
+    }
+
+    private int nthCharValue(String string, int nth) {
+        return string.charAt(nth) - 'a';
     }
 
     /**
