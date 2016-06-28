@@ -14,19 +14,23 @@ public class SortingUtils {
 
     public static void main(String[] args) throws Exception {
 
-        int[] a = {5, 9, 1, 5, 6, 7, 8, 9, 3, 4, 5, 6};
-        int[] b = {800, 34234, 434, 900, 1000};
-//        arrayShuffle(a);
-        arrayShuffle(b);
+        int[] a = {1, 2, 3, 4, 5};
+        System.out.println(find2ndMin_faster(a));
 
-        k_sort(a, 4);
-        for (int i = 0; i < a.length; i++) {
-            System.out.print(a[i] + " ");
+    }
+
+    private static double log2(int h) {
+        double numPowers = 0;
+        int n = 1;
+        while (n < h) {
+            n *= 2;
+            ++numPowers;
         }
-        System.out.println();
-        for (int i = 0; i < a.length; i++) {
-            //System.out.print(b[i] + " ");
-        }
+        if (n > h)
+            --numPowers;
+
+        numPowers += h / (n * 1.0);
+        return numPowers;
     }
 
     // TODO: bug when a.length >= 3*k
@@ -34,6 +38,87 @@ public class SortingUtils {
         for (int i = 0; i < k; i++) {
             merge_sort(a, 0, a.length, k, i);
         }
+    }
+
+    private static int getLosers(int start, int[] a, int[] losers, int numLosers, int min) {
+        for (int i = start; i + 1 < a.length; i += 2) {
+            if (a[i] < a[i + 1]) {
+                // a[i] is possibly less than min
+                if (min > a[i]) {
+                    losers[numLosers++] = min;
+                    // assign the new min
+                    min = a[i];
+                } else {
+                    // add a[i] to losers
+                    losers[numLosers++] = a[i];
+                }
+            }
+            // a[i+1] <= a[i]
+            else {
+                // a[i+1] possibly smaller than min
+                if (min > a[i + 1]) {
+                    losers[numLosers++] = min;
+                    // assign the new min
+                    min = a[i + 1];
+                } else {
+                    // add a[i+1] to losers cause it isn't smaller than min
+                    losers[numLosers++] = a[i + 1];
+                }
+            }
+        }
+        return numLosers;
+    }
+
+    public static int find2ndMin_faster(int[] a) {
+        int min;
+        /*
+         * losers[] represents any values of a that are compared
+         * against the current min and are found > than the current min
+         * we will only needed log(n) space for the losers to
+         * the min
+         */
+        int numLosers = 0;
+        int[] losers = new int[(int) Math.ceil(log2(a.length))];
+        int start = 1;
+        if (a.length % 2 == 0) {
+            start = 2;
+            if (a[0] < a[1]) {
+                min = a[0];
+                losers[numLosers++] = a[1];
+            } else {
+                min = a[1];
+                losers[numLosers++] = a[0];
+            }
+        } else {
+            min = a[0];
+        }
+        numLosers = getLosers(start, a, losers, numLosers, min);
+        min = losers[0];
+        for (int i = 1; i < numLosers; i++) {
+            if (min > losers[i])
+                min = losers[i];
+        }
+        return min;
+    }
+
+    static int find2ndMin(int[] a) {
+        int min2 = a[0];
+        int min = a[1];
+        if (min2 < min) {
+            min = a[0];
+            min2 = a[1];
+        }
+        for (int i = 2; i < a.length; i++) {
+            if (a[i] >= min) {
+                if (a[i] <= min2)
+                    min2 = a[i];
+            } else {
+                min2 = min;
+                min = a[i];
+
+            }
+        }
+        return min2;
     }
 
     private static void merge_sort(int[] a, int start, int end, int k, int i) {
