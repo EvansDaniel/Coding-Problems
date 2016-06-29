@@ -199,11 +199,33 @@ def find_kth_nums_by_median(a, k):
     return r
 
 
+# does the same thing as find_kth_nums_by_median, just a different approach
+# using the distance of the numbers from the median index 
+def kth_distance_away(a, k):
+    med_i = median_index(len(a))
+    # r records the distances between the other elements and the med_i
+    r = []
+    for i in range(0, len(a)):
+        if i != med_i:
+            temp = med_i - i
+            # if i > med_i, temp will be negative
+            if temp < 0:
+                # flip temp
+                temp = -temp
+            # add that distance to r
+            r.append(temp)
+            
+    # find the rank k - 1 element value
+    kth = select(a, k - 1)
+    for i in range(med_i - kth / 2, len(r)):
+        if i != med_i:
+            # if distance is less than the kth element
+            if r[i] <= kth:
+                print a[i]
+
+
 # end functions --------------------------------------------
-a = [1, 2, 3, 4]
-k = 6
+a = [1, 2, 3, 5, 6]
+k = 2
 
-r = find_kth_nums_by_median(a, k)
-
-for i in r:
-    print i
+kth_distance_away(a, k)
