@@ -1,7 +1,10 @@
-def select(items, n):
-    med = median(items)
-    smaller = [item for item in items if item < med]
-    larger = [item for item in items if item > med]
+import math
+
+
+def selectNth(a, n):
+    med = median(a)
+    smaller = [item for item in a if item < med]
+    larger = [item for item in a if item > med]
 
     if len(smaller) == n:
         return med
@@ -11,49 +14,150 @@ def select(items, n):
         return select(list(larger), n - len(smaller) - 1)
 
 
-def median(items):
+def median(a):
     def median_index(n):
         if n % 2:
             return n // 2
         else:
             return n // 2 - 1
 
-    def partition(items, element):
+    def partition(a, element):
         i = 0
 
-        for j in range(len(items) - 1):
-            if items[j] == element:
-                items[j], items[-1] = items[-1], items[j]
+        for j in range(len(a) - 1):
+            if a[j] == element:
+                a[j], a[-1] = a[-1], a[j]
 
-            if items[j] < element:
-                items[i], items[j] = items[j], items[i]
+            if a[j] < element:
+                a[i], a[j] = a[j], a[i]
                 i += 1
 
-        items[i], items[-1] = items[-1], items[i]
+        a[i], a[-1] = a[-1], a[i]
 
         return i
 
-    def select(items, n):
+    def select(a, n):
 
-        if len(items) <= 1:
-            return items[0]
+        if len(a) <= 1:
+            return a[0]
 
         medians = []
 
-        for i in range(0, len(items), 5):
-            group = sorted(items[i:i + 5])
-            items[i:i + 5] = group
+        for i in range(0, len(a), 5):
+            group = sorted(a[i:i + 5])
+            a[i:i + 5] = group
             median = group[median_index(len(group))]
             medians.append(median)
 
             pivot = select(medians, median_index(len(medians)))
-            index = partition(items, pivot)
+            index = partition(a, pivot)
 
             if n == index:
-                return items[index]
+                return a[index]
             elif n < index:
-                return select(items[:index], n)
+                return select(a[:index], n)
             else:
-                return select(items[:], median_index(len(items)))
+                return select(a[:], median_index(len(a)))
 
-    return select(items[:], median_index(len(items)))
+    return select(a[:], median_index(len(a)))
+
+
+def k_quantiles(a, k):
+    # return empty list if k == 1
+    if k == 1:
+        return []
+    # if k is odd
+    elif k % 2:
+        n = len(a)
+        # left median index
+        left_index = math.ceil((k // 2) * (n / k)) - 1
+        # right median index
+        right_index = n - left_index - 1
+
+        # value at left median index
+        left = select(a, left_index)
+        # value at right median index
+        right = select(a, right_index)
+
+        partition(a, left)
+        # find the k_quantiles of the lower partition, [0,left)
+        lower = k_quantiles(a[:left], k // 2)
+        partition(a, right)
+        # find the kth quantiles of the right partition, [right=left+1, len(a))
+        upper = k_quantiles(a[right + 1:], k // 2)
+
+        return lower + [left, right] + upper
+    # if k is even
+    else:
+        index = median_index(len(a))
+        median = select(a, index)
+        partition(a, median)
+
+        return k_quantiles(a[:index], k // 2) + \
+               [median] + \
+               k_quantiles(a[index + 1:], k // 2)
+
+
+# returns the lower median index in some range [0,n]
+def median_index(n):
+    if n % 2:
+        return n // 2
+    else:
+        return (n // 2) - 1
+
+
+def partition(a, element):
+    i = 0
+    # put elements less than element to the left of element
+    # put elements > element to the right of element
+    for j in range(len(a) - 1):
+        if a[j] == element:
+            a[j], a[-1] = a[-1], a[j]
+
+        if a[j] < element:
+            a[i], a[j] = a[j], a[i]
+            i += 1
+    # swap the last known element < element with the end element
+    a[i], a[-1] = a[-1], a[i]
+
+    return i
+
+
+# bug if a < k and len(a) > 1
+def select(a, n):
+    # if 1 element
+    if len(a) == 1:
+        return a[0]
+    elif len(a) <= 0:
+        raise IndexError("len(a) cannot be <= 0")
+
+    # declare medians array
+    medians = []
+    # insertion sort each every 5 elements, store them in group, assign them
+    # back to a[i:i+5], append the median found in group to the medians array
+    for i in range(0, len(a), 5):
+        group = sorted(a[i:i + 5])
+        a[i:i + 5] = group
+        median = group[median_index(len(group))]
+        medians.append(median)
+    # find the median of medians in the medians array
+    # by calling select recursively
+    pivot = select(medians, median_index(len(medians)))
+    # partition the passed array around the median of medians (pivot)
+    index = partition(a, pivot)
+    # if the n == the ith element found (represented by index)
+    if n == index:
+        return a[index]
+    elif n < index:
+        # if less than, look in the left partition
+        return select(a[:index], n)
+    else:
+        # if greater than, look in the right partition
+        return select(a[index + 1:], n - index - 1)
+
+
+# end functions --------------------------------------------
+a = [1, 2, 3, 4]
+k = median_index(len(a)) // 2
+
+print select(a, k)
