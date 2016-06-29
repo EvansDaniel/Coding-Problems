@@ -14,8 +14,19 @@ public class SortingUtils {
 
     public static void main(String[] args) throws Exception {
 
-        int[] a = {1, 2, 3, 4, 5};
-        System.out.println(find2ndMin_faster(a));
+        int[] a = {1,
+                5,
+                3,
+                10,
+                8,
+                5,
+                7,
+                4};
+        arrayShuffle(a);
+        insertionSort(a, 0, a.length);
+        for (int i = 0; i < a.length; i++) {
+            System.out.println(a[i]);
+        }
 
     }
 
@@ -68,6 +79,7 @@ public class SortingUtils {
         }
         return numLosers;
     }
+
 
     public static int find2ndMin_faster(int[] a) {
         int min;
@@ -180,9 +192,12 @@ public class SortingUtils {
         for (int i = 0; i < a.length; ) {
             int index = (int) Math.floor(Math.random() * a.length);
             if (index != i) {
-                swap(a, index, 0);
+                swap(a, index, i);
                 ++i;
             }
+        }
+        for (int i = 0; i < a.length; i++) {
+            System.out.println(a[i]);
         }
     }
 
@@ -217,8 +232,10 @@ public class SortingUtils {
         // Sort buckets and place back into input array
         int currentIndex = 0;
         for (int i = 0; i < buckets.size(); i++) {
-            Integer[] bucketArray = new Integer[buckets.get(i).size()]; // x
-            bucketArray = buckets.get(i).toArray(bucketArray); // x
+            int[] bucketArray = new int[buckets.get(i).size()]; // x
+            for (int j = 0; j < bucketArray.length; j++) {
+                bucketArray[i] = Integer.parseInt(buckets.get(i).get(j).toString());
+            }
             insertionSort(bucketArray); // x
 
             for (int j = 0; j < bucketArray.length; j++) {
@@ -399,30 +416,36 @@ public class SortingUtils {
         return num += (a[end] - a[start]);
     }
 
+    public static void insertionSort(int[] a) {
+        insertionSort(a, 0, a.length);
+    }
+
     /**
      * 'new' elements are defined as a[j]
      * 'old' elements are defined as a[j-1...0]
      * @param a any array
      */
-    public static void insertionSort(Integer[] a) {
-        for (int j = 1; j < a.length; ++j) {
+    // TODO: FIX THE Integer[] type to int[]
+    public static int[] insertionSort(int[] a, int start, int end) {
+        for (int j = start + 1; j < end; ++j) {
             // save value of 'new' element
             int key = a[j];
 
             int i = j - 1;
             // loop through the 'old' indices
-            while (i >= 0 && a[i] > key) {
+            while (i >= start && a[i] > key) {
                 // make the next element be the current element, i.e. shift the
                 // current element over; this is okay because we have saved the
                 // value of the 'new' index in key
                 a[i + 1] = a[i];
-                // decrement i, will make it to -1
+                // decrement i, loop stops at i = -1
                 --i;
             }
             // will 'insert' the 'new' element either at the beginning or
             // at the point where the key is greater than a[i]
             a[i + 1] = key;
         }
+        return a;
     }
 
     public static void insertionSort(double[] a) {
@@ -588,6 +611,9 @@ public class SortingUtils {
         return partition(a, start, end);
     }
 
+    public static int partition(int[] a, int start, int end) {
+        return partition(a, start, end, end);
+    }
     /**
      * Loop Invariant:
      * At the beginning of each iteration of the loop of lines 3–6, for any array
@@ -603,19 +629,18 @@ public class SortingUtils {
      * 3. If k = end, then A[k] = x.
      *
      * @param a   any array
-     * @param p   start index
-     * @param end end index
+     * @param end end index. must be <= a.length-1
      * @return the index of the pivot element
      */
-    public static int partition(int[] a, int p, int end) {
+    public static int partition(int[] a, int start, int end, int pivotI) {
         // pivot is the element that is being compared against;
         // a good pivot will split the array in half
-        int pivot = a[end];
-        int lastKnownElementLessThanPivot = p - 1;
+        int pivot = a[pivotI];
+        int lastKnownElementLessThanPivot = start - 1;
         // j represents the current element that is being iterated through
         int j;
-        // NOTE: on the first recursion into partition end == a.length-2
-        for (j = p; j < end; ++j) {
+        // NOTE: on the first recursion into partition end goes up to a.length-2
+        for (j = start; j < end; ++j) {
             // to sort in decreasing order, flip the >= sign to <=
             if (a[j] <= pivot) {
                 // increment the last known element
@@ -624,17 +649,19 @@ public class SortingUtils {
                 swap(a, lastKnownElementLessThanPivot, j);
             }
         }
-        // swap pivot with the the element just after the last known
-        // element less than the pivot
-        swap(a, lastKnownElementLessThanPivot + 1, end);
-        // if all the elements in a are equal
-        if (lastKnownElementLessThanPivot == j)
-            return (int) Math.floor((p + end) / 2);
+        /*
+         1. end for loop: all elements less than the pivot are
+         to the left of the pivots position after the swap below
+
+         2. swap pivot with the the element just after(reason for +1) the last known
+         element less than the pivot
+         */
+        swap(a, lastKnownElementLessThanPivot + 1, pivotI);
 
         return lastKnownElementLessThanPivot + 1;
     }
 
-    private static void swap(int[] a, int x, int j) {
+    public static void swap(int[] a, int x, int j) {
 
         int tmp = a[x];
         a[x] = a[j];
