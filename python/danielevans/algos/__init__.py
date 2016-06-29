@@ -157,7 +157,7 @@ def select(a, n):
 
 
 # end functions --------------------------------------------
-a = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-k = 8
+a = [1, 2, 3, 4]
+k = 2
 
-print k_quantiles(a, k)
+print select(a, k)
