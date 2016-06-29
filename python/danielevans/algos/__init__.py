@@ -156,8 +156,54 @@ def select(a, n):
         return select(a[index + 1:], n - index - 1)
 
 
+def compute_lower_bounds(pivot, k):
+    # if k is odd it will cause and large enough,
+    # it will cause bound to be negative
+    bound = pivot - (k // 2) - (k % 2)
+    if bound < 0:
+        # since bound is negative, we will take this into account for the
+        # the upper bound computation and adjust upper bound accordingly
+        # to produce kth elements
+        return pivot - (k // 2)
+
+    return bound
+
+
+def compute_upper_bounds(pivot, k):
+    # builds the knowledge of what happened in the lower bound computation
+    bound = pivot - (k // 2) - (k % 2)
+    if bound < 0:
+        # add the k % 2 that was added in the lower bound to the upper bound
+        return pivot + (k // 2) + 1 + (k % 2)
+    else:
+        # this means that lower bound took the extra k % 2
+        # so we don't need to add that here
+        return pivot + (k // 2) + 1
+
+
+# will list the numbers that come median-k/2 before the median
+# and the #s that come median+k/2 + 1 after the median
+# happens a little differently if k is odd; we try to add an
+# extra number to the lower portion (median-k/2-(k%2)) and if we go out of bounds
+# we add an extra number to the upper range (median+k/2+(k%2))
+def find_kth_nums_by_median(a, k):
+    m = median_index(len(a))
+
+    r = []
+    for i in range(compute_lower_bounds(m, k), m):
+        r.append(select(a, i))
+
+    for i in range(m + 1, compute_upper_bounds(m, k)):
+        r.append(select(a, i))
+
+    return r
+
+
 # end functions --------------------------------------------
 a = [1, 2, 3, 4]
-k = 2
+k = 6
 
-print select(a, k)
+r = find_kth_nums_by_median(a, k)
+
+for i in r:
+    print i
