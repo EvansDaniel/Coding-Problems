@@ -99,11 +99,31 @@ def k_quantiles(a, k):
 
 
 # returns the lower median index in some range [0,n]
+# remember that this median index represents the index of the
+# median element IF THIS SEQUENCE IS SORTED. Note that the notion
+# of a sequence below is assumed because most use cases will pass the length of
+# an array i.e. sequence
 def median_index(n):
+    # if odd
     if n % 2:
+        # take the middle element's index of the sequence
         return n // 2
+    # even
     else:
+        # take the lower index
         return (n // 2) - 1
+
+
+# assumes m >= n
+def median_index_of_range(n, m):
+    # if odd
+    if (m - n) % 2:
+        # take the middle element's index of the sequence
+        return (m - n) // 2
+    # if even
+    else:
+        # take the lower index
+        return ((m - n) // 2) - 1
 
 
 def partition(a, element):
@@ -200,7 +220,9 @@ def find_kth_nums_by_median(a, k):
 
 
 # does the same thing as find_kth_nums_by_median, just a different approach
-# using the distance of the numbers from the median index 
+# using the distance of the numbers from the median index
+# unfortunately this function has a bug when k = 2 and a = [1,2,3,4,5,6]
+# TODO: FIX THE BUG
 def kth_distance_away(a, k):
     med_i = median_index(len(a))
     # r records the distances between the other elements and the med_i
@@ -214,18 +236,48 @@ def kth_distance_away(a, k):
                 temp = -temp
             # add that distance to r
             r.append(temp)
-            
+
     # find the rank k - 1 element value
     kth = select(a, k - 1)
+    # stores output elements
+    h = []
     for i in range(med_i - kth / 2, len(r)):
         if i != med_i:
             # if distance is less than the kth element
             if r[i] <= kth:
-                print a[i]
+                h.append(a[i])
+    return h
+
+
+# assumes a and b are sorted arrays
+# and that and b have the same number of elements
+def two_array_median(a, b):
+    # a = [1, 2, 3, 7]
+    med = median_index(len(a))
+    if a[med] == b[med] or len(a) == 1:
+        return a[med] if a[med] < b[med] else b[med]
+
+    if a[med] > b[med]:
+        if a[med] <= b[med + 1]:
+            print a[med]
+            return a[med]
+        else:
+            two_array_median(a[0:med + 1], b[med + 1:])
+    else:
+        if b[med] <= a[med + 1]:
+            # print b[med]
+            return b[med]
+        else:
+            two_array_median(a[med + 1:], b[0:med + 1])
 
 
 # end functions --------------------------------------------
-a = [1, 2, 3, 5, 6]
-k = 2
+# 1,2,3,4,[5],6,7,8,9,10
+def main():
+    a = [1, 4, 8, 9]
+    b = [2, 5, 9, 10]
 
-kth_distance_away(a, k)
+    print two_array_median(a, b)
+
+
+main()
