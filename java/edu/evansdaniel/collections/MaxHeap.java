@@ -325,7 +325,7 @@ public class MaxHeap {
         // on 1st iteration, ci is the index of the first child of
         // of the node at index i.
         // we can ++ci because the children of the node at index i are
-        // sequentially ordered, this prevents any kind of call to childD
+        // sequentially ordered, this prevents any kind of extra call to childD
         for (int ci = childD(i, 1); ci < heapSize && ci <= childD(i, numChildren); ++ci) {
             if ((a[ci].priority > a[maxCi].priority))
                 maxCi = ci;

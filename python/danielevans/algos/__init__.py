@@ -98,6 +98,12 @@ def k_quantiles(a, k):
                k_quantiles(a[index + 1:], k // 2)
 
 
+class struct():
+    def __init__(self, value, weight):
+        self.v = value
+        self.w = weight
+
+
 # returns the lower median index in some range [0,n]
 # remember that this median index represents the index of the
 # median element IF THIS SEQUENCE IS SORTED. Note that the notion
@@ -126,6 +132,7 @@ def median_index_of_range(n, m):
         return ((m - n) // 2) - 1
 
 
+# element is a value in the array
 def partition(a, element):
     i = 0
     # put elements less than element to the left of element
@@ -143,7 +150,8 @@ def partition(a, element):
     return i
 
 
-# bug if a < k and len(a) > 1
+# n == the rank of the nth order statistic
+# TODO: bug if a < k and len(a) > 1
 def select(a, n):
     # if 1 element
     if len(a) == 1:
@@ -160,7 +168,7 @@ def select(a, n):
         a[i:i + 5] = group
         median = group[median_index(len(group))]
         medians.append(median)
-    # find the median of medians in the medians array
+    # find the median of medians (stored in pivot) in the medians array
     # by calling select recursively
     pivot = select(medians, median_index(len(medians)))
     # partition the passed array around the median of medians (pivot)
@@ -271,13 +279,82 @@ def two_array_median(a, b):
             two_array_median(a[med + 1:], b[0:med + 1])
 
 
-# end functions --------------------------------------------
+# computes the weighted median of a set of elements (a) in O(n lg n) time
+def weighted_median(a):
+    sorted(a)
+    ws = 0
+    for i in a:
+        ws += i.w
+    s = a[0].w
+    i = 1
+    while (s + a[i].w) < (1 / 2 * ws):
+        s += a[i].w
+
+    return a[i].v
+
+
+# Let A be an input array containing nn elements, aiai the ii-th element
+# and w[i] its corresponding weight. You can determine the weighted median
+# in worst case linear time as follows. If the array length is <= 2, find the
+# weighted median by exhaustive search. Otherwise, find the median element axax
+# using the worst case O(n)O(n) selection algorithm and then partition the array
+# around it (using the worst case O(n)O(n) partition algorithm from QuickSort).
+# Now determine the weight of each partition. If both weights are <= 1/2 then the
+# weighted median is a[x]. If not, then the weighted median must necessarily lie in
+# the partition whose weight is <= 1/2. So, you add the weight of the "lighter" partition
+# to the weight of a[x] and recursively continue searching into
+# the "heavier" partition. Here is the algorithm's pseudocode (written in Latex).
+# TODO: finish this function. Need to figure out the weighting thing
+def weighted_median_n(a, w):
+    if len(a) == 1:
+        return a[0]
+    elif len(a) == 2:
+        if a[0] > a[1]:
+            return a[1]
+        else:
+            return a[2]
+    # determine the median of a , call it x
+
+    temp = []
+    for i in range(0, len(a)):
+        temp[i] = a[i].v
+
+    med = median(temp)
+
+    # partition around x
+    q = partition(a, med)
+    ls = 0
+    gs = 0
+    es = 0
+    for i in range(0, len(a)):
+        if a[i].v < med:
+            ls += a[i].w
+        elif a[i].v > med:
+            gs += a[i].w
+        else:
+            es += a[i].w
+
+    if gs <= .5 and ls <= .5:
+        return med
+
+    if ls > .5:
+        weighted_median_n(a[0:med], w)
+    elif gs > .5:
+        weighted_median_n(a[med:len(a)], w - gs - es)
+
+
+# MAIN FUNCTION ------------------------------------------------------------
 # 1,2,3,4,[5],6,7,8,9,10
 def main():
     a = [1, 4, 8, 9]
     b = [2, 5, 9, 10]
 
-    print two_array_median(a, b)
+    a = [struct(1, 2), struct(3, 4), struct(5, 6), struct(7, 8)]
+
+    print weighted_median_n(a, (2 + 4 + 6 + 8))
 
 
 main()
+
+
+# END MAIN FUNCTION --------------------------------------------------------
