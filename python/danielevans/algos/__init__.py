@@ -98,12 +98,6 @@ def k_quantiles(a, k):
                k_quantiles(a[index + 1:], k // 2)
 
 
-class struct():
-    def __init__(self, value, weight):
-        self.v = value
-        self.w = weight
-
-
 # returns the lower median index in some range [0,n]
 # remember that this median index represents the index of the
 # median element IF THIS SEQUENCE IS SORTED. Note that the notion
@@ -263,20 +257,57 @@ def two_array_median(a, b):
     # a = [1, 2, 3, 7]
     med = median_index(len(a))
     if a[med] == b[med] or len(a) == 1:
-        return a[med] if a[med] < b[med] else b[med]
 
-    if a[med] > b[med]:
-        if a[med] <= b[med + 1]:
-            print a[med]
-            return a[med]
+        if a[med] > b[med]:
+            if a[med] <= b[med + 1]:
+                print a[med]
+                return a[med]
+            else:
+                two_array_median(a[0:med + 1], b[med + 1:])
         else:
-            two_array_median(a[0:med + 1], b[med + 1:])
-    else:
-        if b[med] <= a[med + 1]:
-            # print b[med]
-            return b[med]
-        else:
-            two_array_median(a[med + 1:], b[0:med + 1])
+            if b[med] <= a[med + 1]:
+                # print b[med]
+                return b[med]
+            else:
+                two_array_median(a[med + 1:], b[0:med + 1])
+
+
+# given an array of points ( a ), find a point p that minimizes the sum of
+# the Manhattan distances between all points in a and point p ( post office location problem )
+# @param a an array of (x,y) points
+# @return the point p that minimizes the distance between all points in a and p
+# robust against -x and -y values
+def shortest_manhattan_distance(a):
+    # initialize the coordinate mins and maxes
+    max_x = math.fabs(a[0].x)
+    min_x = math.fabs(a[0].x)
+    max_y = math.fabs(a[0].y)
+    min_y = math.fabs(a[0].y)
+
+    # find the min_y, min_x, max_y, and max_x in all the point in a
+    # takes theta(n) time
+    for point in range(1, len(a)):
+        x = math.fabs(a[point].x)
+        y = math.fabs(a[point].y)
+
+        if x > max_x:
+            max_x = x
+        elif x < min_x:
+            min_x = x
+
+        if y > max_y:
+            max_y = y
+        elif y < min_y:
+            min_y = y
+
+    # return the point that contains an integer x value for the midpoint
+    # between max_x and min_x and and integer y value for the midpoint between
+    # the min_y and max_y
+    return Point(midpoint_integer(min_x, max_x), midpoint_integer(min_y, max_y))
+
+
+def midpoint_integer(x1, x2):
+    return math.floor((x2 + x1) / 2)
 
 
 # computes the weighted median of a set of elements (a) in O(n lg n) time
@@ -309,49 +340,50 @@ def weighted_median_n(a, w):
     if len(a) == 1:
         return a[0]
     elif len(a) == 2:
-        if a[0] > a[1]:
-            return a[1]
+        return a[0] if a[0] < a[1] else a[1]
+
+    else:
+        t = []
+        ws = 0
+        for i in range(len(a)):
+            ws += a[i]
+
+        med = median(a)
+        q = partition(a, med)
+
+        w_low = 0
+        w_high = 0
+        for i in range(len(a)):
+            if a[i] < med:
+                w_low += a[i]
+            else:
+                w_high += a[i]
+
+        if w_low < .5 and w_high < .5:
+            return med
+        elif w_low > .5:
+            w = w + w_low
+            weighted_median_n(a[0:median_index(len(a))], w)
         else:
-            return a[2]
-    # determine the median of a , call it x
+            w = w + w_high
+            weighted_median_n(a[median_index(len(a)):], w)
 
-    temp = []
-    for i in range(0, len(a)):
-        temp[i] = a[i].v
 
-    med = median(temp)
-
-    # partition around x
-    q = partition(a, med)
-    ls = 0
-    gs = 0
-    es = 0
-    for i in range(0, len(a)):
-        if a[i].v < med:
-            ls += a[i].w
-        elif a[i].v > med:
-            gs += a[i].w
-        else:
-            es += a[i].w
-
-    if gs <= .5 and ls <= .5:
-        return med
-
-    if ls > .5:
-        weighted_median_n(a[0:med], w)
-    elif gs > .5:
-        weighted_median_n(a[med:len(a)], w - gs - es)
+class Point():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 
 # MAIN FUNCTION ------------------------------------------------------------
 # 1,2,3,4,[5],6,7,8,9,10
 def main():
-    a = [1, 4, 8, 9]
-    b = [2, 5, 9, 10]
+    a = [Point(-1, -2), Point(5, 8), Point(-3, -9), Point(1, -4), Point(5, -2)]
 
-    a = [struct(1, 2), struct(3, 4), struct(5, 6), struct(7, 8)]
+    point = shortest_manhattan_distance(a)
 
-    print weighted_median_n(a, (2 + 4 + 6 + 8))
+    print point.x
+    print point.y
 
 
 main()
