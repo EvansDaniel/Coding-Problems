@@ -306,6 +306,15 @@ def shortest_manhattan_distance(a):
     return Point(midpoint_integer(min_x, max_x), midpoint_integer(min_y, max_y))
 
 
+def ith_smallest_n_elements(a, ith):
+    # s for smaller elements in the pairs
+    s_pairs = []
+    for i in range(1, len(a), 2):
+        s_pairs.append(min(a[i], a[i + 1]))
+
+    ith_smallest_n_elements(s_pairs, ith)
+
+
 def midpoint_integer(x1, x2):
     return math.floor((x2 + x1) / 2)
 
