@@ -1,8 +1,12 @@
 class TreeNode:
-    def __init__(self, key, left=None, right=None):
-        self.key = key
+    def __init__(self, value, parent=None, left=None, right=None):
+        self.value = value
+        self.parent = parent
         self.left = left
         self.right = right
+
+    def set_parent(self, parent):
+        self.parent = parent
 
 
 class TreeNodeLeft:
@@ -11,9 +15,6 @@ class TreeNodeLeft:
         self.parent = parent
         self.left = left
         self.sibling = sibling
-
-    def set_parent(self, parent):
-        self.parent = parent
 
     def set_sibling(self, sibling):
         self.sibling = sibling
@@ -55,7 +56,7 @@ def print_tree_non_recursive(node):
 
 # Write an O(n)-time procedure that prints all the keys of an arbitrary
 # rooted tree with n nodes, where the tree is stored using the left-child, right-sibling
-# representation. -> wrote both print only left child tree funcitons for this
+# representation. -> wrote both print only left child tree functions for this
 def print_only_left_child_tree_r(root):
     if root is not None:
         print root.key
@@ -63,15 +64,56 @@ def print_only_left_child_tree_r(root):
         print_only_left_child_tree_r(root.sibling)
 
 
+def print_only_left_helper(node):
+    print(node.key)
+    s = node.sibling
+    while s is not None:
+        print(s.key)
+        if node.left is not None:
+            print_only_left_helper(s.left)
+        s = s.sibling
+
+
 def print_only_left_child_tree_i(node):
     if node is not None:
         while node.parent is not None:
             node = node.parent
         while node is not None:
-            print(node.key)
-            s = node.sibling
-            while s is not None:
-                print(s.key)
-                s = s.sibling
-
+            print_only_left_helper(node)
             node = node.left
+
+
+# a non-recursive constant storage O(n) algorithm for printing a binary tree
+# NOTE: I define 'normal traversal' as prev being the parent of whatever node points to
+def print_t(node):
+    # prev points to the node that node was previously at
+    prev = None
+    while node is not None:
+        # normal traversal of the tree is happening
+        if node.parent == prev:
+            print(node.value)
+            prev = node
+            # if left child null, if this occurs the next iteration will cause the
+            # elif portion of the code to run
+            if node.left is None:
+                node = node.parent
+            else:
+                # continues normal traversal
+                node = node.left
+        # if node.left was at some point null, because at this point we have gone
+        # back to the parent; that is the only way for prev to be left child of node
+        elif node.left == prev:
+            prev = node
+            # we came back to the parent to see if it had a right child, if not
+            # go to the parent
+            if node.right is None:
+                node = node.parent
+            else:
+                # begin normal traversal of the node.right subtree
+                node = node.right
+        else:
+            # getting here indicates that prev is == node.right, meaning that
+            # the only thing left to do is go back to the parent of node
+            # and see if there is a right child subtree to print
+            prev = node
+            node = node.parent
