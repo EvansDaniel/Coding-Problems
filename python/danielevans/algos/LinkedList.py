@@ -1,10 +1,3 @@
-class LinkListNode:
-    def __init__(self, key):
-        self.key = key
-        self.next = None
-        self.prev = None
-
-
 class LinkList:
     def __init__(self):
         self.nil = LinkListNode(None)
