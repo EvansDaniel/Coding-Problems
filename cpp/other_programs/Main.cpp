@@ -2,8 +2,7 @@
 // Created by daniel on 6/21/16.
 //
 
-#include <math.h>
-#include <iostream>
+#include "../classes/BinarySearchTree.h"
 
 bool isPerfectSquare(int num) {
     if (num == 1) return true;
@@ -15,7 +14,7 @@ bool isPerfectSquare(int num) {
 }
 
 int main() {
-    int n = 120;
-    std::cout << isPerfectSquare(n);
+    BinarySearchTree<int> tree;
+    tree.insert(1);
+    tree.inorderPrint();
 };
-
