@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include "Stack.h"
 
 ///<
 
@@ -91,8 +92,67 @@ public:
         node = nullptr;
     }
 
-    void inorderPrint_i() {
+    void postorderPrint() {
         TreeNode *node = root;
+        postorderPrint(node);
+        node = nullptr;
+    }
+
+    void preorderPrint() {
+        TreeNode *node = root;
+        preorderPrint(node);
+        node = nullptr;
+    }
+
+    // prints inner lefts but not inner rights
+    void inorderPrintNoStack() {
+        TreeNode *current = root;
+        TreeNode *pre = nullptr;
+        while (current != nullptr) {
+            if (!current->left) {
+                printf(" %d ", current->data);
+                current = current->right;
+            }
+            else {
+                /* Find the inorder predecessor of current */
+                pre = current->left;
+                while (pre->right && pre->right != current)
+                    pre = pre->right;
+
+                /* Make current as right child of its inorder predecessor */
+                // this is a switch, on the first pass, pre->right will be null, but it is switched to
+                // be the successor of pre. On the next pass, pre->right won't be null, so the else is run.
+                if (pre->right == nullptr) {
+                    pre->right = current;
+                    current = current->left;
+                }
+                else {
+                    pre->right = nullptr;
+                    printf(" %d ", current->data);
+                    current = current->right;
+                } /* End of if condition pre->right == NULL */
+            } /* End of if condition current->left == NULL*/
+        } /* End of while */
+    }
+    void inorderPrintWithStack() {
+        // the stack stores the pointers that point to nodes whose subtrees
+        // we *might* need to iterate through and print the nodes of later
+        Stack<TreeNode *> s;
+        TreeNode *p = root;
+
+        while (p || !s.empty()) {
+            // iterates left from either the right or left child of some parent
+            while (p) {
+                s.push(p);
+                p = p->left;
+            }
+            // save pointer to TreeNode to print later and check its right subtree
+            p = s.peek();
+            s.pop();
+            std::cout << p->data << std::endl;
+            // go to the right subtree, while loops will check for nullity
+            p = p->right;
+        }
     }
 
     void clearTree(TreeNode *root) {
@@ -134,6 +194,22 @@ private:
         }
     }
 
+    void preorderPrint(TreeNode *node) {
+        if (node != nullptr) {
+            std::cout << node->data << std::endl;
+            inorderPrint(node->left);
+            inorderPrint(node->right);
+        }
+    }
+
+    void postorderPrint(TreeNode *node) {
+        if (node != nullptr) {
+            inorderPrint(node->left);
+            inorderPrint(node->right);
+            std::cout << node->data << std::endl;
+        }
+    }
+
     TreeNode *findMax(TreeNode *root) {
         TreeNode *node = root;
         while (node->right) {
@@ -152,23 +228,30 @@ private:
 
     // Takes O(lg(n)) time, because we 'search' through the BST, then
     // insert in theta(1) time
-    void insert(TreeNode *node) {
+    void insert(TreeNode *newNode) {
         TreeNode *back = nullptr;
         TreeNode *temp = root;
+        // performs the search for the place to put the node
         while (temp) {
             back = temp;
-            if (node->data > temp->data)
+            if (newNode->data > temp->data)
                 temp = temp->right;
             else
                 temp = temp->left;
         }
-        node->parent = back;
+        // sets up the nodes parent pointer, will be nullptr if first node inserted
+        newNode->parent = back;
+        /*
+         * back will be null if temp which first points to the root node is null
+         * so if back is null make root point to the new node
+         * otherwise check if newNode should be back's left or right child
+         */
         if (!back)
-            root = node;
-        else if (node->data > back->data)
-            back->right = node;
+            root = newNode;
+        else if (newNode->data > back->data)
+            back->right = newNode;
         else
-            back->left = node;
+            back->left = newNode;
     }
 };
 
