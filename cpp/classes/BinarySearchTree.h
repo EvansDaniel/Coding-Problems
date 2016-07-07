@@ -44,6 +44,10 @@ public:
         // deep copy of rhs
     }
 
+    ~BinarySearchTree() {
+        clearTree(root);
+    }
+
     BinarySearchTree &operator=(const BinarySearchTree &rhs) {
         BinarySearchTree copy = rhs;
         std::swap(*this, copy);
@@ -73,14 +77,44 @@ public:
     }
 
     void insert(T data) {
-        TreeNode *node = root;
-        insert(node, data);
+        TreeNode *node = new TreeNode;
+        node->data = data;
+        insert(node);
         ++numNodes;
     }
     void inorderPrint() {
         TreeNode *node = root;
         inorderPrint(node);
         node = nullptr;
+    }
+
+    void clearTree(TreeNode *root) {
+        if (root == nullptr) return;
+        clearTree(root->left);
+        clearTree(root->right);
+        delete root;
+        return;
+    }
+
+    TreeNode *duplicateNode(TreeNode *node) {
+        TreeNode *duplicateNode;
+        duplicateNode = new TreeNode();
+        *duplicateNode = *node;
+        duplicateNode->left = nullptr;
+        duplicateNode->right = nullptr;
+        return duplicateNode;
+    }
+
+    TreeNode *searchTree(T d) {
+        TreeNode *temp;
+        for (temp = root; temp != nullptr && temp->data != d;) {
+            if (d < temp->data)
+                temp = temp->left;
+            else
+                temp = temp->right;
+        }
+        if (temp == nullptr) return nullptr;
+        return duplicateNode(temp);
     }
 
 private:
@@ -92,40 +126,23 @@ private:
         }
     }
 
-    void insert(TreeNode *node, T data) {
-        if (node == nullptr) {
-            node = new TreeNode;
-            node->data = data;
-            return;
+    void insert(TreeNode *node) {
+        TreeNode *back = nullptr;
+        TreeNode *temp = root;
+        while (temp) {
+            back = temp;
+            if (node->data > temp->data)
+                temp = temp->right;
+            else
+                temp = temp->left;
         }
-        else if (data >= node->data && node->right == nullptr) {
-            node->right = new TreeNode;
-            node->right->data = data;
-        }
-        else if (data <= node->data && node->left == nullptr) {
-            node->left = new TreeNode;
-            node->left->data = data;
-        }
-        else if (data >= node->data && data <= node->right->data) {
-            TreeNode *temp = node->right;
-            node->right = new TreeNode;
-            node->right->data = data;
-            // definitely aren't balancing this tree right now
-            node->right->right = temp;
-        }
-        else if (data <= node->data && data >= node->left->data) {
-            TreeNode *temp = node->left;
-            node->left = new TreeNode;
-            node->left->data = data;
-            // definitely aren't balancing this tree right now
-            node->left->left = temp;
-        }
-        else {
-            if (data >= node->data)
-                insert(node->right, data);
-            if (data <= node->data)
-                insert(node->left, data);
-        }
+        node->parent = back;
+        if (!back)
+            root = node;
+        else if (node->data > back->data)
+            back->right = node;
+        else
+            back->left = node;
     }
 };
 
