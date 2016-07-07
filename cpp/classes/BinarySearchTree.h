@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <iostream>
 
+///<
+
 template<typename T>
 /*
  * For all nodes x, if y is in the left subtree of x, key(y) <= key(x)
@@ -69,23 +71,28 @@ public:
     bool empty() {
         return numNodes == 0;
     }
-
-    T findMin() {
-        TreeNode *node;
-        for (node = root; node->left != nullptr; node = node->left);
-        return node->data;
-    }
-
     void insert(T data) {
         TreeNode *node = new TreeNode;
         node->data = data;
         insert(node);
         ++numNodes;
     }
+
+    TreeNode *findMax() {
+        return findMax(root);
+    }
+
+    TreeNode *findMin() {
+        return findMin(root);
+    }
     void inorderPrint() {
         TreeNode *node = root;
         inorderPrint(node);
         node = nullptr;
+    }
+
+    void inorderPrint_i() {
+        TreeNode *node = root;
     }
 
     void clearTree(TreeNode *root) {
@@ -118,6 +125,7 @@ public:
     }
 
 private:
+    // Takes theta(numNodes) time, because obviously we want to print all the nodes
     void inorderPrint(TreeNode *node) {
         if (node != nullptr) {
             inorderPrint(node->left);
@@ -126,6 +134,24 @@ private:
         }
     }
 
+    TreeNode *findMax(TreeNode *root) {
+        TreeNode *node = root;
+        while (node->right) {
+            node = node->right;
+        }
+        return duplicateNode(node);
+    }
+
+    TreeNode *findMin(TreeNode *root) {
+        TreeNode *node = root;
+        while (node->left) {
+            node = node->left;
+        }
+        return duplicateNode(node);
+    }
+
+    // Takes O(lg(n)) time, because we 'search' through the BST, then
+    // insert in theta(1) time
     void insert(TreeNode *node) {
         TreeNode *back = nullptr;
         TreeNode *temp = root;

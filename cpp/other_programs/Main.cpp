@@ -23,4 +23,5 @@ int main() {
     tree.insert(-1);
     tree.insert(0);
     tree.inorderPrint();
+    std::cout << tree.findMin()->data << std::endl;
 };
