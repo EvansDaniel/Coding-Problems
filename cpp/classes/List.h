@@ -1,33 +1,36 @@
 #include <algorithm>
 
-template<typename Object>
+/**
+ *      Node struct that contains data of some type, pointer to previous node
+ *      and pointer to the next node in the list
+ */
+template<typename T>
+struct Node {
+    T data;
+    Node *prev;
+    Node *next;
+
+    // constructor for the Node struct, T {} initializes d with default constructor of T
+    Node(const T &d = T{}, Node *p = nullptr,
+         Node *n = nullptr)
+            : data{d}, prev{p}, next{n} { }
+
+
+    Node(T &&d, Node *p = nullptr, Node *n = nullptr)
+            : data{std::move(d)}, prev{p}, next{n} { }
+};
+
+
+template<typename T>
 class List {
 private:
-    /**
-     *      Node struct that contains data of some type, pointer to previous node
-     *      and pointer to the next node in the list
-     */
-    struct Node {
-        Object data;
-        Node *prev;
-        Node *next;
-
-        // constructor for the Node struct, Object {} initializes d with default constructor of Object
-        Node(const Object &d = Object{}, Node *p = nullptr,
-             Node *n = nullptr)
-                : data{d}, prev{p}, next{n} { }
-
-
-        Node(Object &&d, Node *p = nullptr, Node *n = nullptr)
-                : data{std::move(d)}, prev{p}, next{n} { }
-    };
 
     // number of nodes in list
     int theSize;
     // reference to the head sentinel node
-    Node *head;
+    Node<T> *head;
     // reference to the last node in list
-    Node *tail;
+    Node<T> *tail;
 
 public:
     class const_iterator {
@@ -35,7 +38,7 @@ public:
         const_iterator() : current{nullptr} { }
 
         // returns the data at current
-        const Object &operator*() const { return retrieve(); }
+        const T &operator*() const { return retrieve(); }
 
         // advances the iterator forward
         // TODO: go backward too
@@ -65,16 +68,16 @@ public:
 
     protected:
         // Node at the iterator's current position
-        Node *current;
+        Node<T> *current;
 
         // return lvalue reference to current's data
-        Object &retrieve() const { return current->data; }
+        T &retrieve() const { return current->data; }
 
         // constructor to initialize const_iterator with pointer to Node
-        const_iterator(Node *p) : current{p} { }
+        const_iterator(Node<T> *p) : current{p} { }
 
         // needs to be a friend to access its members such as current or
-        friend class List<Object>;
+        friend class List<T>;
     };
 
     // everything an const_iterator is but non-const
@@ -82,9 +85,9 @@ public:
     public:
         iterator() { }
 
-        Object &operator*() { return const_iterator::retrieve(); }
+        T &operator*() { return const_iterator::retrieve(); }
 
-        const Object &operator*() const { return const_iterator::operator*(); }
+        const T &operator*() const { return const_iterator::operator*(); }
 
         iterator &operator++() {
             this->current = this->current->next;
@@ -98,9 +101,9 @@ public:
         }
 
     protected:
-        iterator(Node *p) : const_iterator{p} { }
+        iterator(Node<T> *p) : const_iterator{p} { }
 
-        friend class List<Object>;
+        friend class List<T>;
     };
 
 public:
@@ -188,44 +191,44 @@ public:
 
     // returns an lvalue reference to the data in the first node in the list -
     // calls retrieve on the first node in the list
-    Object &front() {
+    T &front() {
         return *begin();
     }
 
     // returns a const lvalue refernce but otherwise same as the other front
-    const Object &front() const {
+    const T &front() const {
         return *begin();
     }
 
     // returns lvalue reference to the data contained in the last node in the list
-    Object &back() {
+    T &back() {
         return *--end();
     }
 
     // same as other back but returns a const lvalue reference
-    const Object &back() const {
+    const T &back() const {
         return *--end();
     }
 
     // @param x data to place into the new node
     // inserts the node at the front of the list
-    void push_front(const Object &x) {
+    void push_front(const T &x) {
         insert(begin(), x);
     }
 
     // moves the data from the rvalue reference
     // into the new node, inserts it at the front
-    void push_front(Object &&x) {
+    void push_front(T &&x) {
         insert(begin(), std::move(x));
     }
 
-    // same as push_front(const Object&), but inserted at the back
-    void push_back(const Object &x) {
+    // same as push_front(const T&), but inserted at the back
+    void push_back(const T &x) {
         insert(end(), x);
     }
 
-    // same as push_front(Object&&), but inserted at the back
-    void push_back(Object &&x) {
+    // same as push_front(T&&), but inserted at the back
+    void push_back(T &&x) {
         insert(end(), std::move(x));
     }
 
@@ -242,24 +245,24 @@ public:
     }
 
     // inserts node containing x before itr
-    iterator insert(iterator itr, const Object &x) {
-        Node *p = itr.current;
+    iterator insert(iterator itr, const T &x) {
+        Node<T> *p = itr.current;
         theSize++;
-        return {p->prev = p->prev->next = new Node{x, p->prev, p}};
+        return {p->prev = p->prev->next = new Node<T>{x, p->prev, p}};
     }
 
     // Insert x before itr.
-    iterator insert(iterator itr, Object &&x) {
-        Node *p = itr.current;
+    iterator insert(iterator itr, T &&x) {
+        Node<T> *p = itr.current;
         theSize++;
         return p->prev = p->prev->next
-                = new Node{std::move(x), p->prev, p};
+                = new Node<T>{std::move(x), p->prev, p};
     }
 
 
     // Erase item at itr.
     iterator erase(iterator itr) {
-        Node *p = itr.current;
+        Node<T> *p = itr.current;
         iterator retVal{p->next};
         p->prev->next = p->next;
         p->next->prev = p->prev;
@@ -282,8 +285,8 @@ public:
     // set size to 0
     void init() {
         theSize = 0;
-        head = new Node;
-        tail = new Node;
+        head = new Node<T>;
+        tail = new Node<T>;
         head->next = tail;
         tail->prev = head;
     }

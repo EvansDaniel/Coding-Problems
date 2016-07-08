@@ -15,6 +15,9 @@ bool isPerfectSquare(int num) {
 
 int main() {
     BinarySearchTree<int> tree;
+    /*
+     *
+     */
     tree.insert(0);
     tree.insert(-5);
     tree.insert(5);
@@ -22,5 +25,6 @@ int main() {
     tree.insert(-3);
     tree.insert(-7);
     tree.insert(-6);
-    tree.preorderPrint();
+    // -8, -7, -6, -5, -3, 0, 5
+    std::cout << tree.select(4)->data;
 };

@@ -8,8 +8,33 @@
 #include <algorithm>
 #include <iostream>
 #include "Stack.h"
+#include <cmath>
+#include <math.h>
+
+/**
+ *  if you mark a method const,
+ *  it means that this will be of type const
+ *  MyClass* instead of MyClass*,  which in its turn means that you cannot
+ *  change nonstatic data members that are not declared mutable,
+ *  , nor can you call any non-const methods.
+ */
 
 ///<
+template<typename T>
+struct TreeNode {
+    T data;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode *parent;
+
+    // constructor for the TreeNode struct, T {} initializes d with default constructor of T
+    TreeNode(const T &d = T{}, TreeNode *p = nullptr,
+             TreeNode *left = nullptr, TreeNode *right = nullptr)
+            : data{d}, parent{p}, left{left}, right{right} { }
+
+    TreeNode(T &&d, TreeNode *p = nullptr, TreeNode *l = nullptr, TreeNode *r = nullptr)
+            : data{std::move(d)}, parent{p}, left{l}, right{r} { }
+};
 
 template<typename T>
 /*
@@ -20,22 +45,7 @@ class BinarySearchTree {
 
 private:
 
-    struct TreeNode {
-        T data;
-        TreeNode *left;
-        TreeNode *right;
-        TreeNode *parent;
-
-        // constructor for the TreeNode struct, T {} initializes d with default constructor of T
-        TreeNode(const T &d = T{}, TreeNode *p = nullptr,
-                 TreeNode *left = nullptr, TreeNode *right = nullptr)
-                : data{d}, parent{p}, left{left}, right{right} { }
-
-        TreeNode(T &&d, TreeNode *p = nullptr, TreeNode *l = nullptr, TreeNode *r = nullptr)
-                : data{std::move(d)}, parent{p}, left{l}, right{r} { }
-    };
-
-    TreeNode *root;
+    TreeNode<T> *root;
     int numNodes;
 
 public:
@@ -69,57 +79,58 @@ public:
         rhs.root = nullptr;
     }
 
-    bool empty() {
+    bool empty() const {
         return numNodes == 0;
     }
     void insert(T data) {
-        TreeNode *node = new TreeNode;
+        TreeNode<T> *node = new TreeNode<T>;
         node->data = data;
         insert(node);
         ++numNodes;
     }
 
-    TreeNode *findMax() {
+    const TreeNode<T> *findMax() const {
         return findMax(root);
     }
 
-    TreeNode *findMin() {
+    const TreeNode<T> *findMin() const {
         return findMin(root);
     }
-    void inorderPrint() {
-        TreeNode *node = root;
+
+    void inorderPrint() const {
+        TreeNode<T> *node = root;
         inorderPrint(node);
         node = nullptr;
     }
 
-    void postorderPrint() {
-        TreeNode *node = root;
+    void postorderPrint() const {
+        TreeNode<T> *node = root;
         postorderPrint(node);
         node = nullptr;
     }
 
-    void preorderPrint() {
-        TreeNode *node = root;
+    void preorderPrint() const {
+        TreeNode<T> *node = root;
         preorderPrint(node);
         node = nullptr;
     }
 
     // prints inner lefts but not inner rights
-    void inorderPrintNoStack() {
-        TreeNode *current = root;
-        TreeNode *pre = nullptr;
+    void inorderPrintNoStack() const {
+        TreeNode<T> *current = root;
+        TreeNode<T> *pre = nullptr;
         while (current != nullptr) {
             if (!current->left) {
                 printf(" %d ", current->data);
                 current = current->right;
             }
             else {
-                /* Find the inorder predecessor of current */
+                // Find the inorder predecessor of current
                 pre = current->left;
                 while (pre->right && pre->right != current)
                     pre = pre->right;
 
-                /* Make current as right child of its inorder predecessor */
+                // Make current as right child of its inorder predecessor
                 // this is a switch, on the first pass, pre->right will be null, but it is switched to
                 // be the successor of pre. On the next pass, pre->right won't be null, so the else is run.
                 if (pre->right == nullptr) {
@@ -130,15 +141,16 @@ public:
                     pre->right = nullptr;
                     printf(" %d ", current->data);
                     current = current->right;
-                } /* End of if condition pre->right == NULL */
-            } /* End of if condition current->left == NULL*/
-        } /* End of while */
+                }
+            }
+        }
     }
-    void inorderPrintWithStack() {
+
+    void inorderPrintWithStack() const {
         // the stack stores the pointers that point to nodes whose subtrees
         // we *might* need to iterate through and print the nodes of later
-        Stack<TreeNode *> s;
-        TreeNode *p = root;
+        Stack<TreeNode<T> *> s;
+        TreeNode<T> *p = root;
 
         while (p || !s.empty()) {
             // iterates left from either the right or left child of some parent
@@ -146,7 +158,7 @@ public:
                 s.push(p);
                 p = p->left;
             }
-            // save pointer to TreeNode to print later and check its right subtree
+            // save pointer to TreeNode<T> to print later and check its right subtree
             p = s.peek();
             s.pop();
             std::cout << p->data << std::endl;
@@ -155,25 +167,8 @@ public:
         }
     }
 
-    void clearTree(TreeNode *root) {
-        if (root == nullptr) return;
-        clearTree(root->left);
-        clearTree(root->right);
-        delete root;
-        return;
-    }
-
-    TreeNode *duplicateNode(TreeNode *node) {
-        TreeNode *duplicateNode;
-        duplicateNode = new TreeNode();
-        *duplicateNode = *node;
-        duplicateNode->left = nullptr;
-        duplicateNode->right = nullptr;
-        return duplicateNode;
-    }
-
-    TreeNode *searchTree(T d) {
-        TreeNode *temp;
+    const TreeNode<T> *searchTree(T d) const {
+        TreeNode<T> *temp;
         for (temp = root; temp != nullptr && temp->data != d;) {
             if (d < temp->data)
                 temp = temp->left;
@@ -181,12 +176,115 @@ public:
                 temp = temp->right;
         }
         if (temp == nullptr) return nullptr;
-        return duplicateNode(temp);
+        return temp;
     }
 
+    const TreeNode<T> *searchTree_r(T d) const {
+        TreeNode<T> *node = root;
+        node = searchTree(node, d);
+        return node;
+    }
+
+    const TreeNode<T> *findTreeWithRank(int rank) const {
+        int numNodes = this->numNodes;
+        TreeNode<T> *node = root;
+    }
+
+    bool isBST() const {
+        TreeNode<T> *node = root;
+        return isBST(node, findMin()->data, findMax()->data);
+    }
+
+    const TreeNode<T> *select(int rank) const {
+        if (rank < 0 || rank > numNodes) {
+            throw std::invalid_argument
+                    ("rank is either negative or greater than the number of nodes in the tree");
+        }
+        const TreeNode<T> *node = select(root, rank);
+        return node;
+    }
+
+    int size() {
+        TreeNode<T> *node = root;
+        int nodes = 0;
+        return size(node, nodes);
+    }
+
+    int height(const TreeNode<T> *node) const {
+        if (node == nullptr) return -1;
+        return 1 + std::max(height(node->right), height(node->left));
+    }
+
+    // returns the height of the first node whose data == d
+    int height(T d) const {
+        const TreeNode<T> *node = searchTree(d);
+        return height(node);
+    }
+
+    int size(T d) const {
+        const TreeNode<T> *node = searchTree(d);
+//        int nodes = 0;
+//        return size(node, nodes);
+        return size(node);
+    }
 private:
+    // size ---------------------
+    int size(const TreeNode<T> *root, int &nodes) const {
+        if (root == this->root)
+            return numNodes;
+        if (root != nullptr) {
+            ++nodes;
+            if (root->right) size(root->right, nodes);
+            if (root->left) size(root->left, nodes);
+        }
+        return nodes;
+    }
+
+    int size(const TreeNode<T> *root) const {
+        if (root == this->root)
+            return numNodes;
+        if (root == nullptr)
+            return 0;
+        return (1 + size(root->left) + size(root->right));
+    }
+
+    const TreeNode<T> *select(const TreeNode<T> *root, int rank) const {
+        if (!root) return nullptr;
+        int nodes = 0;
+        int t = size(root->left, nodes);
+        // remember when we return, we still act with root, not its right or left children
+        if (t > rank) return select(root->left, rank);
+        else if (t < rank) return select(root->right, rank - t - 1);
+        else return root;
+    }
+
+    void clearTree(TreeNode<T> *root) {
+        if (root == nullptr) return;
+        clearTree(root->left);
+        clearTree(root->right);
+        delete root;
+        --numNodes;
+        return;
+    }
+
+    bool isBST(TreeNode<T> *root, T min, T max) const {
+        if (root == nullptr) return true;
+        if (root->data < min) return false;
+        if (root->data > max) return false;
+        return isBST(root->left, min, root->data) && isBST(root->right, root->data, max);
+    }
+
+    TreeNode<T> *searchTree(TreeNode<T> *node, T d) const {
+        if (node == nullptr || node->data == d) {
+            return node;
+        }
+        if (d > node->data)
+            return searchTree(node->right, d);
+        else
+            return searchTree(node->left, d);
+    }
     // Takes theta(numNodes) time, because obviously we want to print all the nodes
-    void inorderPrint(TreeNode *node) {
+    void inorderPrint(TreeNode<T> *node) const {
         if (node != nullptr) {
             inorderPrint(node->left);
             std::cout << node->data << std::endl;
@@ -194,7 +292,7 @@ private:
         }
     }
 
-    void preorderPrint(TreeNode *node) {
+    void preorderPrint(TreeNode<T> *node) const {
         if (node != nullptr) {
             std::cout << node->data << std::endl;
             inorderPrint(node->left);
@@ -202,7 +300,7 @@ private:
         }
     }
 
-    void postorderPrint(TreeNode *node) {
+    void postorderPrint(TreeNode<T> *node) const {
         if (node != nullptr) {
             inorderPrint(node->left);
             inorderPrint(node->right);
@@ -210,27 +308,27 @@ private:
         }
     }
 
-    TreeNode *findMax(TreeNode *root) {
-        TreeNode *node = root;
+    const TreeNode<T> *findMax(TreeNode<T> *root) const {
+        TreeNode<T> *node = root;
         while (node->right) {
             node = node->right;
         }
-        return duplicateNode(node);
+        return node;
     }
 
-    TreeNode *findMin(TreeNode *root) {
-        TreeNode *node = root;
+    const TreeNode<T> *findMin(TreeNode<T> *root) const {
+        TreeNode<T> *node = root;
         while (node->left) {
             node = node->left;
         }
-        return duplicateNode(node);
+        return node;
     }
 
     // Takes O(lg(n)) time, because we 'search' through the BST, then
     // insert in theta(1) time
-    void insert(TreeNode *newNode) {
-        TreeNode *back = nullptr;
-        TreeNode *temp = root;
+    void insert(TreeNode<T> *newNode) {
+        TreeNode<T> *back = nullptr;
+        TreeNode<T> *temp = root;
         // performs the search for the place to put the node
         while (temp) {
             back = temp;
