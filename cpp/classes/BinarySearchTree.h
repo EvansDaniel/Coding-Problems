@@ -8,8 +8,14 @@
 #include <algorithm>
 #include <iostream>
 #include "Stack.h"
+#include "Vector.h"
 #include <cmath>
 #include <math.h>
+#include <stdlib.h>
+#include <ctime>
+#include <cstdlib>
+#include <random>
+#include <array>
 
 /**
  *  if you mark a method const,
@@ -20,6 +26,7 @@
  */
 
 ///<
+// TODO: ADD DUPLICATE NODE PRIVATE METHOD TO PREVENT MANIPULATION TO TREE
 template<typename T>
 struct TreeNode {
     T data;
@@ -223,12 +230,94 @@ public:
 
     int size(T d) const {
         const TreeNode<T> *node = searchTree(d);
-//        int nodes = 0;
-//        return size(node, nodes);
         return size(node);
     }
+
+    T getTreeMedian() const {
+        if (numNodes % 2 == 0)
+            return select(numNodes / 2 - 1);
+        else
+            return select(numNodes / 2);
+    }
+
+    const TreeNode<T> *createBalancedTree(std::vector<T> v) {
+        std::sort(std::begin(v), std::end(v));
+        return balanceTreeHelper(v, v.begin(), v.end(), nullptr);
+    }
+
+    const TreeNode<T> *successor(TreeNode<T> *node) {
+        if (node->right) {
+            return findMin(node->right);
+        }
+        TreeNode<T> *parent = node->parent;
+        if (parent == nullptr) return node;
+        else {
+            
+        }
+    }
+    /*template<typename It>
+    void quicksort(It lowerIt, It upperIt) {
+        auto size = std::distance(lowerIt, upperIt);
+        std::cout << size << std::endl;
+        if(size > 1) {
+            auto p = std::prev(upperIt);
+            std::swap(*std::next(lowerIt, size/2), *p);
+            auto mid = std::partition(lowerIt, p, [p](decltype(*p) v) { return v < *p; });
+            std::swap(*mid, *p);
+            // the element at index mid is considered sorted, thus we don't
+            // include it in the recursions
+            quicksort(lowerIt, mid);
+            quicksort(std::next(mid), upperIt);
+        }
+    }*/
+
 private:
-    // size ---------------------
+    // for sorted containers, returns the value of median element
+    template<typename Iterator>
+    long getMedian(Iterator begin,
+                   Iterator end) const {
+        long dist = std::distance(begin, end);
+        if (dist % 2 == 0)
+            return dist / 2 - 1;
+        else
+            return dist / 2;
+    }
+
+    // Takes theta(numNodes) time, because obviously we want to print all the nodes
+    void inorderPrint(const TreeNode<T> *node) const {
+        if (node != nullptr) {
+            inorderPrint(node->left);
+            std::cout << node->data << std::endl;
+            inorderPrint(node->right);
+        }
+    }
+
+    // v must have no duplicates
+    // TODO: fix this
+    const TreeNode<T> *balanceTreeHelper(const std::vector<T> &v,
+                                         typename std::vector<T>::const_iterator begin,
+                                         typename std::vector<T>::const_iterator end,
+                                         TreeNode<T> *parent) {
+
+        TreeNode<T> *node = nullptr;
+        if (begin != end) {
+            long median = getMedian(begin, end);
+            std::cout << median << " ";
+            node = new TreeNode<T>(v.at((unsigned long) median), parent);
+//            std::cout << node->data << " ";
+            if (node->parent) {
+                if (node->data < node->parent->data) {
+                    node->parent->left = node;
+                }
+                else {
+                    node->parent->right = node;
+                }
+            }
+            balanceTreeHelper(v, v.begin(), v.begin() + median, node);
+            balanceTreeHelper(v, v.begin() + median + 1, v.end(), node);
+        }
+        return node;
+    }
     int size(const TreeNode<T> *root, int &nodes) const {
         if (root == this->root)
             return numNodes;
@@ -282,14 +371,6 @@ private:
             return searchTree(node->right, d);
         else
             return searchTree(node->left, d);
-    }
-    // Takes theta(numNodes) time, because obviously we want to print all the nodes
-    void inorderPrint(TreeNode<T> *node) const {
-        if (node != nullptr) {
-            inorderPrint(node->left);
-            std::cout << node->data << std::endl;
-            inorderPrint(node->right);
-        }
     }
 
     void preorderPrint(TreeNode<T> *node) const {
