@@ -19,20 +19,25 @@ int main() {
     /*
      *
      */
-    tree.insert(0);
-    tree.insert(-5);
-    tree.insert(5);
-    tree.insert(-8);
-    tree.insert(-3);
-    tree.insert(-7);
-    tree.insert(-6);
-    // -8, -7, -6, -5, -3, 0, 5
-    // median == -5
-    std::vector<int> v;
-    v.push_back(1);
-    v.push_back(2);
-    v.push_back(3);
-    v.push_back(4);
-    v.push_back(5);
-
+    tree.insert(100);
+    tree.insert(50);
+    tree.insert(25);
+    tree.insert(33);
+    tree.insert(75);
+    tree.insert(66);
+    tree.insert(12);
+    tree.insert(85);
+    tree.insert(200);
+    tree.insert(150);
+    tree.insert(125);
+    tree.insert(133);
+    tree.insert(166);
+    tree.insert(199);
+    tree.insert(140);
+    const TreeNode<int> *a = tree.select(8);
+    const TreeNode<int> *b = tree.select(12);
+//    printf(" %d %d\n", a->data, b->data);
+    a = tree.findLowestCommonAncestor(a, b);
+    if (a)
+        std::cout << a->data;
 };

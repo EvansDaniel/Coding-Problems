@@ -61,16 +61,43 @@ public:
         this->numNodes = 0;
     }
     BinarySearchTree(const BinarySearchTree &rhs) {
-        // deep copy of rhs
+        this->root = nullptr;
+        this->numNodes = 0;
+        TreeNode<T> *temp = rhs.root;
+        traversal(temp);
+        temp = nullptr;
+    }
+
+    void traversal(TreeNode<T> *root) {
+        if (!root)
+            return;
+        insert(root->data);
+        traversal(root->left);
+        traversal(root->right);
     }
 
     ~BinarySearchTree() {
         clearTree(root);
     }
 
-    BinarySearchTree &operator=(const BinarySearchTree &rhs) {
-        BinarySearchTree copy = rhs;
-        std::swap(*this, copy);
+    /*
+    // naive implementation of copy-swap idiom
+    BinarySearchTree &operator=(const BinarySearchTree &rhs) { // rhs is reference to src, even if src is an rvalue
+        BinarySearchTree copy = rhs; // copy construction of rhs does the hard work
+        swap(*this, copy);  // swap this's resources for copy's
+        return *this; // our (old) resources get destroyed with copy
+    }
+     */
+    // pre c++11, if compiler implements copy elision and rhs is rvalue,
+    // compiler will just move the source into rhs rather than copying (worst
+    // case is that the compiler must copy it anyway, which is best case in
+    // naive implementation); however, above where we pass by const reference
+    // and explicitly copy, the compiler does not have the opportunity to optimize
+    // away the copy into rhs. In c++11, the move assignment operator is called
+    // explicitly by compiler when passing an rvalue, but this mode of
+    // thought is still useful to think about
+    BinarySearchTree &operator=(BinarySearchTree rhs) {
+        swap(*this, rhs);
         return *this;
     }
 
@@ -96,11 +123,11 @@ public:
         ++numNodes;
     }
 
-    const TreeNode<T> *findMax() const {
+    TreeNode<T> *findMax() const {
         return findMax(root);
     }
 
-    const TreeNode<T> *findMin() const {
+    TreeNode<T> *findMin() const {
         return findMin(root);
     }
 
@@ -245,16 +272,65 @@ public:
         return balanceTreeHelper(v, v.begin(), v.end(), nullptr);
     }
 
-    const TreeNode<T> *successor(TreeNode<T> *node) {
+    TreeNode<T> *predecessor(TreeNode<T> *node) {
+        if (node->left)
+            return findMax(node->left);
+        TreeNode<T> *nodeParent = node->parent;
+        while (nodeParent && nodeParent->left == node) {
+            node = nodeParent;
+            nodeParent = nodeParent->parent;
+        }
+        return nodeParent;
+    }
+
+    TreeNode<T> *successor(TreeNode<T> *node) {
         if (node->right) {
             return findMin(node->right);
         }
-        TreeNode<T> *parent = node->parent;
-        if (parent == nullptr) return node;
-        else {
-            
+        TreeNode<T> *nodeParent = node->parent;
+        // while ... and node is the right child of parent
+        while (nodeParent != nullptr && node == nodeParent->right) {
+            node = nodeParent;
+            nodeParent = nodeParent->parent;
         }
+        return nodeParent;
     }
+
+    TreeNode<T> *findMinRecursive() {
+        TreeNode<T> *node = root;
+        return findMin_r(node);
+    }
+
+    TreeNode<T> *findMaxRecursive() {
+        TreeNode<T> *node = root;
+        return findMax_r(node);
+    }
+
+    /**
+     * Precondition: a and b are non-null nodes in the tree
+     */
+    const TreeNode<T> *findLowestCommonAncestor(const TreeNode<T> *a, const TreeNode<T> *b) {
+        TreeNode<T> *ancestor = root;
+        while (ancestor) {
+            // if ancestor > both a and b
+            if (ancestor->data > a->data && ancestor->data > b->data)
+                ancestor = ancestor->left;
+                // if ancestor < both a and b
+            else if (ancestor->data < a->data && ancestor->data < b->data)
+                ancestor = ancestor->right;
+                // we found LCA so break
+            else
+                break;
+        }
+        // could be null if while is skipped
+        return ancestor;
+    }
+
+    TreeNode<T> *LCA_r(const TreeNode<T> *a, const TreeNode<T> *b) {
+        TreeNode<T> *node = root;
+        return LCAHelper_r(node, a, b);
+    }
+
     /*template<typename It>
     void quicksort(It lowerIt, It upperIt) {
         auto size = std::distance(lowerIt, upperIt);
@@ -272,6 +348,36 @@ public:
     }*/
 
 private:
+    TreeNode<T> *LCAHelper_r(TreeNode<T> *root, const TreeNode<T> *a, const TreeNode<T> *b) {
+        if (!root) return nullptr;
+        // If both n1 and n2 are smaller than root, then LCA lies in left
+        if (root->data > a->data && root->data > b->data)
+            return LCAHelper_r(root->left, a, b);
+
+        // If both n1 and n2 are greater than root, then LCA lies in right
+        if (root->data < a->data && root->data < b->data)
+            return LCAHelper_r(root->right, a, b);
+
+        return root;
+    }
+    /**
+     * we have assured that a->data < b->data
+     */
+    /*const TreeNode<T>* LCAHelper(const TreeNode<T>* a, const TreeNode<T>* b) {
+        TreeNode<T>* ancestor = root;
+        while(ancestor) {
+            if(a == ancestor)
+                return a;
+            if(b == ancestor)
+                return b;
+            if(ancestor->data > a->data && ancestor->data < b->data)
+                return ancestor;
+            if(ancestor->data > b->data)
+                ancestor = ancestor->left;
+            else
+                ancestor = ancestor->right;
+        }
+    }*/
     // for sorted containers, returns the value of median element
     template<typename Iterator>
     long getMedian(Iterator begin,
@@ -281,6 +387,16 @@ private:
             return dist / 2 - 1;
         else
             return dist / 2;
+    }
+
+    friend void swap(BinarySearchTree &first, BinarySearchTree &second) {
+        // enable ADL (not necessary in our case, but good practice)
+        using std::swap;
+
+        // by swapping the members of two classes,
+        // the two classes are effectively swapped
+        swap(first.root, second.root);
+        swap(first.numNodes, second.numNodes);
     }
 
     // Takes theta(numNodes) time, because obviously we want to print all the nodes
@@ -304,7 +420,6 @@ private:
             long median = getMedian(begin, end);
             std::cout << median << " ";
             node = new TreeNode<T>(v.at((unsigned long) median), parent);
-//            std::cout << node->data << " ";
             if (node->parent) {
                 if (node->data < node->parent->data) {
                     node->parent->left = node;
@@ -349,8 +464,10 @@ private:
 
     void clearTree(TreeNode<T> *root) {
         if (root == nullptr) return;
-        clearTree(root->left);
-        clearTree(root->right);
+        if (root->left)
+            clearTree(root->left);
+        if (root->right)
+            clearTree(root->right);
         delete root;
         --numNodes;
         return;
@@ -389,7 +506,7 @@ private:
         }
     }
 
-    const TreeNode<T> *findMax(TreeNode<T> *root) const {
+    TreeNode<T> *findMax(TreeNode<T> *root) const {
         TreeNode<T> *node = root;
         while (node->right) {
             node = node->right;
@@ -397,12 +514,26 @@ private:
         return node;
     }
 
-    const TreeNode<T> *findMin(TreeNode<T> *root) const {
+    TreeNode<T> *findMin(TreeNode<T> *root) const {
         TreeNode<T> *node = root;
         while (node->left) {
             node = node->left;
         }
         return node;
+    }
+
+    TreeNode<T> *findMin_r(TreeNode<T> *root) const {
+        if (!root) return nullptr;
+        if (root->left)
+            return findMin_r(root->left);
+        return root;
+    }
+
+    TreeNode<T> *findMax_r(TreeNode<T> *root) const {
+        if (!root) return nullptr;
+        if (root->right)
+            return findMax_r(root->right);
+        return root;
     }
 
     // Takes O(lg(n)) time, because we 'search' through the BST, then
