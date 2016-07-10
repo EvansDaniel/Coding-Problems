@@ -201,27 +201,21 @@ public:
         }
     }
 
-    const TreeNode<T> *searchTree(T d) const {
-        TreeNode<T> *temp;
+    bool containsNode(T d) const {
+        TreeNode<T> *temp = nullptr;
         for (temp = root; temp != nullptr && temp->data != d;) {
             if (d < temp->data)
                 temp = temp->left;
             else
                 temp = temp->right;
         }
-        if (temp == nullptr) return nullptr;
-        return temp;
+        if (temp == nullptr) return false;
+        return true;
     }
 
     const TreeNode<T> *searchTree_r(T d) const {
         TreeNode<T> *node = root;
-        node = searchTree(node, d);
-        return node;
-    }
-
-    const TreeNode<T> *findTreeWithRank(int rank) const {
-        int numNodes = this->numNodes;
-        TreeNode<T> *node = root;
+        return searchTree(node, d);
     }
 
     bool isBST() const {
@@ -324,6 +318,25 @@ public:
         }
         // could be null if while is skipped
         return ancestor;
+    }
+
+    bool deleteNode(T data) {
+        TreeNode<T> *delNode = searchTree(this->root, data);
+        if (delNode) {
+            if (delNode->right && delNode->left) {
+                TreeNode<T> *predecessor = predecessor(delNode);
+                std::swap(*delNode, *predecessor);
+                delete predecessor;
+            }
+            else if (delNode->right || delNode->left) {
+
+            }
+            else {
+
+            }
+            return true;
+        }
+        return false;
     }
 
     TreeNode<T> *LCA_r(const TreeNode<T> *a, const TreeNode<T> *b) {
