@@ -324,8 +324,7 @@ public:
         TreeNode<T> *delNode = searchTree(this->root, data);
         if (delNode) {
             if (delNode->right && delNode->left) {
-                TreeNode<T> *predecessor = predecessor(delNode);
-                std::swap(*delNode, *predecessor);
+
                 delete predecessor;
             }
             else if (delNode->right || delNode->left) {
@@ -361,6 +360,20 @@ public:
     }*/
 
 private:
+    void transplant(TreeNode<T> *u, TreeNode<T> *v) {
+        // u is the root
+        if (u->parent == nullptr)
+            root = v;
+            // if u is a left child
+        else if (u == u->parent->left)
+            u->parent->left = v;
+            // if u is a right child
+        else
+            u->parent->right = v;
+        if (v != nullptr) {
+            v->parent = u->parent;
+        }
+    }
     TreeNode<T> *LCAHelper_r(TreeNode<T> *root, const TreeNode<T> *a, const TreeNode<T> *b) {
         if (!root) return nullptr;
         // If both n1 and n2 are smaller than root, then LCA lies in left
