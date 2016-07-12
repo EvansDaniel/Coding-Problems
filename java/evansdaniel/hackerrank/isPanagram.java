@@ -1,3 +1,5 @@
+package evansdaniel.hackerrank;
+
 import java.util.BitSet;
 import java.util.Scanner;
 
