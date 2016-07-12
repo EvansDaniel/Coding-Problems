@@ -163,45 +163,64 @@ private:
          *         prop 4 (red node cannot have red children), it is b/c
          *         both nn and nn->parent are red
          */
-        while (nn->parent->color == RED) {
-            // nn's parent is a left child
+        // checks for a double red violation
+        while (nn != r && nn->parent->color == RED) {
+
+            // CASE A: nn's parent is a left child
             if (nn->parent == nn->parent->parent->left) {
                 // nn's parent's sibling
-                RBNode<T> *y = nn->parent->parent->right;
-                // sibling of nn's parent is red
-                if (y->color == RED) {
+                // CASE 1: nn's uncle is red
+                RBNode<T> *u = nn->parent->parent->right;
+                // **UNCLE IS RED**
+                if (u && u->color == RED) {
+                    // change parent black
                     nn->parent->color = BLACK;
-                    nn->color = BLACK;
+                    // change uncle to black
+                    u->color = BLACK;
+                    // change grandparent red
                     nn->parent->parent->color = RED;
+                    // make nn its grandparent
                     nn = nn->parent->parent;
                 }
-                    // nn is a right child
-                else if (nn == nn->parent->right) {
-                    nn = nn->parent;
-                    leftRotate(nn);
+                else {
+                    // CASE 2: nn is a right child of its parent
+                    if (nn == nn->parent->right) {
+                        nn = nn->parent;
+                        leftRotate(nn);
+                    }
+                    // CASE 3: nn is left child of its parent
                     nn->parent->color = BLACK;
+                    // change nn's grandparent red
                     nn->parent->parent->color = RED;
                     rightRotate(nn);
                 }
             }
-                // nn's parent is a right child
+                // CASE B: nn's parent is a right child
             else {
-                // nn's parent's sibling
-                RBNode<T> *y = nn->parent->parent->left;
+                // CASE 1: nn's parent's sibling
+                RBNode<T> *u = nn->parent->parent->left;
                 // sibling of nn's parent is red
-                if (y->color == RED) {
+                if (u && u->color == RED) {
+                    // change parent black
                     nn->parent->color = BLACK;
-                    nn->color = BLACK;
+                    // change uncle black
+                    u->color = BLACK;
+                    // change grandparent red
                     nn->parent->parent->color = RED;
+                    // make nn its grandparent
                     nn = nn->parent->parent;
                 }
-                    // nn is a left child
-                else if (nn == nn->parent->left) {
-                    nn = nn->parent;
-                    leftRotate(nn);
+                else {
+                    // CASE 2: nn is a left child of its parent
+                    if (nn == nn->parent->left) {
+                        nn = nn->parent;
+                        rightRotate(nn);
+                    }
+                    // CASE 3: nn is a right child of its parent
                     nn->parent->color = BLACK;
+                    // make nn's grandparent red
                     nn->parent->parent->color = RED;
-                    rightRotate(nn);
+                    leftRotate(nn);
                 }
             }
         }
@@ -209,6 +228,5 @@ private:
         r->color = BLACK;
     }
 };
-
 
 #endif //CPPTEST_REDBLACKTREE_H
