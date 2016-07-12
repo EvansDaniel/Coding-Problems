@@ -73,6 +73,7 @@ public:
      * precondition: x has a right child (not null)
      */
     void leftRotate(RBNode<T> *x) {
+        if (!x->right) return;
         RBNode<T> *y = x->right;
         x->right = y->left;
         // if y's left child
@@ -97,56 +98,57 @@ public:
     /*
      * precondition: x has a left child (not null)
      */
-    void rightRotate(RBNode<T> *x) {
-        RBNode<T> *y = x->left;
-        x->left = y->right;
-        // y has left child (not null)
-        if (y->right != nil)
-            y->right->parent = x;
+    void rightRotate(RBNode<T> *p) {
+        if (!p->left) return;
+        RBNode<T> *lc = p->left;
+        p->left = lc->right;
 
-        y->parent = x->parent;
-        // x is root
-        if (x->parent == nil)
-            r = y;
-            // x is left child
-        else if (x == x->parent->left)
-            x->parent->left = y;
-            // x is right child
+        if (lc->right != nil)
+            lc->right->parent = p;
+
+        lc->parent = p->parent;
+        // p is root
+        if (p->parent == nil)
+            r = lc;
+            // p is left child
+        else if (p == p->parent->left)
+            p->parent->left = lc;
+            // p is right child
         else
-            x->parent->right = y;
+            p->parent->right = lc;
 
-        y->right = x;
-        x->parent = y;
+        lc->right = p;
+        p->parent = lc;
     }
-
     void insert(T d) {
         RBNode<T> *nn = new RBNode<T>(d);
-        RBNode<T> *y = nil;
+        RBNode<T> *p = nil;
         RBNode<T> *x = r;
-        // search for place to put nn (new_node)
+        // how do I know where to put the new node?
+        // search for it based on BST property
         while (x != this->nil) {
-            y = x;
+            p = x;
             if (nn->data < x->data)
                 x = x->left;
             else
                 x = x->right;
         }
 
-        nn->parent = y;
+        nn->parent = p;
         // if y is root
-        if (y == nil)
+        if (p == nil)
             r = nn;
-            // nn should be y's left child
-        else if (nn->data < y->data)
-            y->left = nn;
-            // nn should be y's right child
+            // should nn be y's left or right child?
+        else if (nn->data < p->data)
+            p->left = nn;
         else
-            y->right = nn;
-        // set nn's children and color
+            p->right = nn;
+        // what should I do with nn's pointers/color
         nn->left = nil;
         nn->right = nil;
         nn->color = RED;
-        // rebalance tree
+        // do I need to satisfy some other conditions after insert?
+        // yes, this is a red-black tree of course
         fixInsert(nn);
     }
 
@@ -171,7 +173,7 @@ private:
                 // nn's parent's sibling
                 // CASE 1: nn's uncle is red
                 RBNode<T> *u = nn->parent->parent->right;
-                // **UNCLE IS RED**
+                // ***UNCLE IS RED AND PARENT LEFT CHILD***
                 if (u && u->color == RED) {
                     // change parent black
                     nn->parent->color = BLACK;
@@ -182,6 +184,7 @@ private:
                     // make nn its grandparent
                     nn = nn->parent->parent;
                 }
+                    // ***UNCLE BLACK(or null) AND PARENT LEFT CHILD***
                 else {
                     // CASE 2: nn is a right child of its parent
                     if (nn == nn->parent->right) {
@@ -192,14 +195,14 @@ private:
                     nn->parent->color = BLACK;
                     // change nn's grandparent red
                     nn->parent->parent->color = RED;
-                    rightRotate(nn);
+                    rightRotate(nn->parent->parent);
                 }
             }
                 // CASE B: nn's parent is a right child
             else {
                 // CASE 1: nn's parent's sibling
                 RBNode<T> *u = nn->parent->parent->left;
-                // sibling of nn's parent is red
+                // UNCLE IS RED AND PARENT IS RIGHT CHILD
                 if (u && u->color == RED) {
                     // change parent black
                     nn->parent->color = BLACK;
@@ -210,6 +213,7 @@ private:
                     // make nn its grandparent
                     nn = nn->parent->parent;
                 }
+                    // UNCLE IS BLACK(or null) AND PARENT IS RIGHT CHILD
                 else {
                     // CASE 2: nn is a left child of its parent
                     if (nn == nn->parent->left) {
@@ -220,7 +224,7 @@ private:
                     nn->parent->color = BLACK;
                     // make nn's grandparent red
                     nn->parent->parent->color = RED;
-                    leftRotate(nn);
+                    leftRotate(nn->parent->parent);
                 }
             }
         }
