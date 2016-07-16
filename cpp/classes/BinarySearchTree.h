@@ -117,6 +117,7 @@ public:
         return numNodes == 0;
     }
     void insert(T data) {
+        if (data == nullptr) return;
         TreeNode<T> *node = new TreeNode<T>;
         node->data = data;
         insert(node);
@@ -124,26 +125,31 @@ public:
     }
 
     TreeNode<T> *findMax() const {
+        if (!root) return nullptr;
         return findMax(root);
     }
 
     TreeNode<T> *findMin() const {
+        if (!root) return nullptr;
         return findMin(root);
     }
 
     void inorderPrint() const {
+        if (!root) return;
         TreeNode<T> *node = root;
         inorderPrint(node);
         node = nullptr;
     }
 
     void postorderPrint() const {
+        if (!root) return;
         TreeNode<T> *node = root;
         postorderPrint(node);
         node = nullptr;
     }
 
     void preorderPrint() const {
+        if (!root) return;
         TreeNode<T> *node = root;
         preorderPrint(node);
         node = nullptr;
@@ -151,6 +157,7 @@ public:
 
     // prints inner lefts but not inner rights
     void inorderPrintNoStack() const {
+        if (!root) return;
         TreeNode<T> *current = root;
         TreeNode<T> *pre = nullptr;
         while (current != nullptr) {
@@ -183,6 +190,7 @@ public:
     void inorderPrintWithStack() const {
         // the stack stores the pointers that point to nodes whose subtrees
         // we *might* need to iterate through and print the nodes of later
+        if (!root) return;
         Stack<TreeNode<T> *> s;
         TreeNode<T> *p = root;
 
@@ -202,6 +210,7 @@ public:
     }
 
     bool containsNode(T d) const {
+        if (d == nullptr) return false;
         TreeNode<T> *temp = nullptr;
         for (temp = root; temp != nullptr && temp->data != d;) {
             if (d < temp->data)
@@ -209,16 +218,18 @@ public:
             else
                 temp = temp->right;
         }
-        if (temp == nullptr) return false;
-        return true;
+        return temp != nullptr;
     }
 
     const TreeNode<T> *searchTree_r(T d) const {
+        if (!root || d == nullptr) return nullptr;
         TreeNode<T> *node = root;
         return searchTree(node, d);
     }
 
     bool isBST() const {
+        // empty BST is a BST
+        if (!root) return true;
         TreeNode<T> *node = root;
         return isBST(node, findMin()->data, findMax()->data);
     }
@@ -233,7 +244,7 @@ public:
     }
 
     int size() {
-        TreeNode<T> *node = root;
+        TreeNode<T> *node = root; // root nullity checked in in size() helper
         int nodes = 0;
         return size(node, nodes);
     }
@@ -245,6 +256,7 @@ public:
 
     // returns the height of the first node whose data == d
     int height(T d) const {
+        if (d == nullptr) return -1;
         const TreeNode<T> *node = searchTree(d);
         return height(node);
     }
@@ -254,6 +266,7 @@ public:
         return size(node);
     }
 
+    // gets rvalue of the median of the tree
     T getTreeMedian() const {
         if (numNodes % 2 == 0)
             return select(numNodes / 2 - 1);
@@ -261,12 +274,14 @@ public:
             return select(numNodes / 2);
     }
 
+    // beginnings of a balance tree method
     const TreeNode<T> *createBalancedTree(std::vector<T> v) {
         std::sort(std::begin(v), std::end(v));
         return balanceTreeHelper(v, v.begin(), v.end(), nullptr);
     }
 
     TreeNode<T> *predecessor(TreeNode<T> *node) {
+        if (node == nullptr) return nullptr;
         if (node->left)
             return findMax(node->left);
         TreeNode<T> *nodeParent = node->parent;
@@ -278,6 +293,7 @@ public:
     }
 
     TreeNode<T> *successor(TreeNode<T> *node) {
+        if (node == nullptr) return nullptr;
         if (node->right) {
             return findMin(node->right);
         }
@@ -291,11 +307,13 @@ public:
     }
 
     TreeNode<T> *findMinRecursive() {
+        if (root == nullptr) return nullptr;
         TreeNode<T> *node = root;
         return findMin_r(node);
     }
 
     TreeNode<T> *findMaxRecursive() {
+        if (root == nullptr) return nullptr;
         TreeNode<T> *node = root;
         return findMax_r(node);
     }
@@ -304,6 +322,7 @@ public:
      * Precondition: a and b are non-null nodes in the tree
      */
     const TreeNode<T> *findLowestCommonAncestor(const TreeNode<T> *a, const TreeNode<T> *b) {
+        if (!root || !a || !b) return nullptr;
         TreeNode<T> *ancestor = root;
         while (ancestor) {
             // if ancestor > both a and b
@@ -321,29 +340,45 @@ public:
     }
 
     bool deleteNode(T data) {
+        if (data == nullptr) return false;
+        // we must find the node first
         TreeNode<T> *delNode = searchTree(this->root, data);
+        // check if we found a node
         if (delNode) {
-            if (delNode->right && delNode->left) {
-
-                delete predecessor;
+            if (!delNode->left)
+                transplant(delNode, delNode->right);
+            else if (!delNode->right)
+                transplant(delNode, delNode->left);
+            else { // delNode has 2 children
+                // find delNode's successor
+                TreeNode<T> *y = findMin(delNode->right);
+                // if y != delNode->right
+                if (y->parent != delNode) {
+                    // make y's parent's left pointer point to what y->right points to
+                    transplant(y, y->right);
+                    // y is taking the place of delNode
+                    y->right = delNode->right;
+                    y->right->parent = y;
+                }
+                // make delNode's parent's left or right point to y
+                transplant(delNode, y);
+                // copy delNode's left pointer to maintain the state of its left subtree
+                y->left = delNode->left;
+                y->left->parent = y;
             }
-            else if (delNode->right || delNode->left) {
-
-            }
-            else {
-
-            }
-            return true;
+            delete delNode;
         }
         return false;
     }
 
     TreeNode<T> *LCA_r(const TreeNode<T> *a, const TreeNode<T> *b) {
+        if (!a || !b) return nullptr;
         TreeNode<T> *node = root;
         return LCAHelper_r(node, a, b);
     }
 
-    /*template<typename It>
+    /*
+    template<typename It>
     void quicksort(It lowerIt, It upperIt) {
         auto size = std::distance(lowerIt, upperIt);
         std::cout << size << std::endl;
@@ -357,53 +392,47 @@ public:
             quicksort(lowerIt, mid);
             quicksort(std::next(mid), upperIt);
         }
-    }*/
+    }
+    */
 
-private:
-    void transplant(TreeNode<T> *u, TreeNode<T> *v) {
+protected:
+    /**
+     * switches u->parent's right or left pointer to point
+     * to v, or if u is the root, makes root point at v
+     */
+    void transplant(TreeNode<T> *p, TreeNode<T> *c) {
+        if (p == nullptr) return;
         // u is the root
-        if (u->parent == nullptr)
-            root = v;
+        if (p->parent == nullptr)
+            root = c;
             // if u is a left child
-        else if (u == u->parent->left)
-            u->parent->left = v;
+        else if (p == p->parent->left)
+            p->parent->left = c;
             // if u is a right child
         else
-            u->parent->right = v;
-        if (v != nullptr) {
-            v->parent = u->parent;
+            p->parent->right = c;
+        // c might be null
+        if (c != nullptr) {
+            c->parent = p->parent;
         }
     }
-    TreeNode<T> *LCAHelper_r(TreeNode<T> *root, const TreeNode<T> *a, const TreeNode<T> *b) {
-        if (!root) return nullptr;
-        // If both n1 and n2 are smaller than root, then LCA lies in left
-        if (root->data > a->data && root->data > b->data)
-            return LCAHelper_r(root->left, a, b);
 
-        // If both n1 and n2 are greater than root, then LCA lies in right
-        if (root->data < a->data && root->data < b->data)
-            return LCAHelper_r(root->right, a, b);
-
-        return root;
-    }
     /**
-     * we have assured that a->data < b->data
+     * recursive helper for finding the lowest common ancestor
+     * of two nodes (a and b)
      */
-    /*const TreeNode<T>* LCAHelper(const TreeNode<T>* a, const TreeNode<T>* b) {
-        TreeNode<T>* ancestor = root;
-        while(ancestor) {
-            if(a == ancestor)
-                return a;
-            if(b == ancestor)
-                return b;
-            if(ancestor->data > a->data && ancestor->data < b->data)
-                return ancestor;
-            if(ancestor->data > b->data)
-                ancestor = ancestor->left;
-            else
-                ancestor = ancestor->right;
-        }
-    }*/
+    TreeNode<T> *LCAHelper_r(TreeNode<T> *current, const TreeNode<T> *a, const TreeNode<T> *b) {
+        if (!current) return nullptr;
+        // a->data and b->data < current-> data, look in current->left subtree for LCA
+        if (current->data > a->data && current->data > b->data)
+            return LCAHelper_r(current->left, a, b);
+
+        // a->data and b->data > current-> data, look in current->right subtree for LCA
+        if (current->data < a->data && current->data < b->data)
+            return LCAHelper_r(current->right, a, b);
+
+        return current;
+    }
     // for sorted containers, returns the value of median element
     template<typename Iterator>
     long getMedian(Iterator begin,

@@ -72,27 +72,27 @@ public:
     /*
      * precondition: x has a right child (not null)
      */
-    void leftRotate(RBNode<T> *x) {
-        if (!x->right) return;
-        RBNode<T> *y = x->right;
-        x->right = y->left;
+    void leftRotate(RBNode<T> *p) {
+        if (!p->right) return;
+        RBNode<T> *y = p->right;
+        p->right = y->left;
         // if y's left child
         if (y->left != nil) {
-            y->left->parent = x;
+            y->left->parent = p;
         }
-        y->parent = x->parent;
+        y->parent = p->parent;
         // x is root
-        if (x->parent == nil)
+        if (p->parent == nil)
             r = y;
             // x is left child
-        else if (x == x->parent->left)
-            x->parent->left = y;
+        else if (p == p->parent->left)
+            p->parent->left = y;
             // x is right child
         else
-            x->parent->right = y;
+            p->parent->right = y;
 
-        y->left = x;
-        x->parent = y;
+        y->left = p;
+        p->parent = y;
     }
 
     /*
@@ -147,12 +147,65 @@ public:
         nn->left = nil;
         nn->right = nil;
         nn->color = RED;
-        // do I need to satisfy some other conditions after insert?
-        // yes, this is a red-black tree of course
         fixInsert(nn);
     }
 
+    /**
+     * deletes the first node containing the data d from
+     * red-black tree while maintaining the red-black properties
+     */
+    void deleteNode(T data) {
+        RBNode<T> *d = searchTree_r(data);
+        RBNode<T> *y, *x;
+        if (!d) return;
+
+        if (!d->left || !d->right) {
+            // d has a null child
+            y = d;
+        }
+        else {
+            // y is d's successor
+            y = d->right;
+            while (y->left)
+                y = y->left;
+        }
+
+        // x is y's only child
+        if (y->left) {
+            x = y->left;
+        } else {
+            x = y->right;
+        }
+
+        // remove y from the parent chain
+        x->parent = y->parent;
+        if (y->parent) if (y == y->parent->left)
+            y->parent->left = x;
+        else
+            y->parent->right = x;
+        else
+            r = x;
+
+        if (y != d)
+            d->data = y->data;
+
+        if (y->color == BLACK)
+            fixDelete(d);
+
+        delete y;
+    }
+
 private:
+
+    void transplant(RBNode<T> *p, RBNode<T> *c) {
+        if (p->parent == this->nil)
+            r = c;
+        else if (p == p->parent->left)
+            p->parent->left = c;
+        else
+            p->parent->right = c;
+        c->parent = p->parent;
+    }
     void fixInsert(RBNode<T> *nn) {
         /**
          * Loop Invariant at the start of each iteration:
@@ -166,7 +219,7 @@ private:
          *         both nn and nn->parent are red
          */
         // checks for a double red violation
-        while (nn != r && nn->parent->color == RED) {
+        while (nn->parent->color == RED) {
 
             // CASE A: nn's parent is a left child
             if (nn->parent == nn->parent->parent->left) {
@@ -231,6 +284,69 @@ private:
         // make sure root is black
         r->color = BLACK;
     }
+
+    void fixDelete(RBNode<T> *x) {
+
+        while (x != r && x->color == BLACK) {
+            // X IS A LEFT CHILD 
+            if (x == x->parent->left) {
+                RBNode<T> *uncle = x->parent->right;
+                // UNCLE IS RED 
+                if (uncle->color == RED) {
+                    uncle->color = BLACK;
+                    x->parent->color = RED;
+                    leftRotate(x->parent);
+                    uncle = x->parent->right;
+                }
+                // W'S CHILDREN ARE BLACK 
+                if (uncle->left->color == BLACK && uncle->right->color == BLACK) {
+                    uncle->color = RED;
+                    x = x->parent;
+                } else { // 1 OF W'S CHILDREN IS RED 
+                    if (uncle->right->color == BLACK) {
+                        uncle->left->color = BLACK;
+                        uncle->color = RED;
+                        rightRotate(uncle);
+                        uncle = x->parent->right;
+                    }
+                    uncle->color = x->parent->color;
+                    x->parent->color = BLACK;
+                    uncle->right->color = BLACK;
+                    leftRotate(x->parent);
+                    x = r;
+                }
+                // X IS A RIGHT CHILD
+            } else {
+                RBNode<T> *uncle = x->parent->left;
+                // UNCLE IS RED 
+                if (uncle->color == RED) {
+                    uncle->color = BLACK;
+                    x->parent->color = RED;
+                    rightRotate(x->parent);
+                    uncle = x->parent->left;
+                }
+                // W'S CHILDREN ARE BLACK 
+                if (uncle->right->color == BLACK && uncle->left->color == BLACK) {
+                    uncle->color = RED;
+                    x = x->parent;
+                } else {
+                    if (uncle->left->color == BLACK) {
+                        uncle->right->color = BLACK;
+                        uncle->color = RED;
+                        leftRotate(uncle);
+                        uncle = x->parent->left;
+                    }
+                    uncle->color = x->parent->color;
+                    x->parent->color = BLACK;
+                    uncle->left->color = BLACK;
+                    rightRotate(x->parent);
+                    x = r;
+                }
+            }
+        }
+        x->color = BLACK;
+    }
 };
+
 
 #endif //CPPTEST_REDBLACKTREE_H
