@@ -1,36 +1,3 @@
-import sys
-
-
-def fib_seq(n):
-    if n < 0:
-        return None
-    if n == 0:
-        return 0
-    x1 = 0
-    x2 = 1
-
-    for i in range(2, n):
-        x3 = x1 + x2
-        x1 = x2
-        x2 = x3
-
-    return x2
-
-
-def fib_seq_r(n):
-    if n < 0:
-        return None
-    fib_seq_r(n)
-
-
-def fib_seq_r_helper(n):
-    if n == 0:
-        return 0
-    if n == 1:
-        return 1
-    return fib_seq_r(n - 1) + fib_seq_r(n - 2)
-
-
 # changing coins
 def coin_change(amount, den):
     c = [0] * (len(den) + 1)
