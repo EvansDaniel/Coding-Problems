@@ -1,5 +1,5 @@
-from python.danielevans.algos.BinaryTreeAlgos import TreeNode, print_t
-from python.danielevans.algos.MergeableHeap import MergeableHeapUnsorted
+from python.BinaryTreeAlgos import TreeNode, print_t
+from python.MergeableHeap import MergeableHeapUnsorted
 
 
 def print_tree_demo():
@@ -35,6 +35,3 @@ def mergeHeap():
     k.extract_min()
 
     k.print_list()
-
-
-mergeHeap()
