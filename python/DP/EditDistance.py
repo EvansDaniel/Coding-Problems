@@ -2,7 +2,7 @@ def edit_distance(str1, str2):
     m = len(str1)
     n = len(str2)
     # create an n x m matrix to store values
-    dp = [[0]*(n+1) for x in range(m + 1)]
+    dp = [[0] * (n + 1) for x in range(m + 1)]
 
     # iter thru str1
     for i in range(m + 1):
@@ -10,7 +10,7 @@ def edit_distance(str1, str2):
         for j in range(n + 1):
 
             # If first string is empty, only option is to
-            # isnert all characters of second string
+            # insert all characters of second string
             if i == 0:
                 dp[i][j] = j
 
@@ -32,6 +32,7 @@ def edit_distance(str1, str2):
                 dp[i][j] = 1 + minimum([dp[i][j - 1],  # insert
                                         dp[i - 1][j - 1],  # replace
                                         dp[i - 1][j]])  # remove
+
     # returns the answer to the original problem
     return dp[m][n]
 
@@ -43,7 +44,7 @@ def minimum(array):
 
     return min
 
+
 str1 = "sunday"
 str2 = "saturday"
 print edit_distance(str1, str2)
-
