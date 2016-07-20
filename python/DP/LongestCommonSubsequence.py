@@ -1,4 +1,4 @@
-def long_common_subsequence(str1, str2):
+def longest_common_subsequence(str1, str2):
     #             columns                     rows
     dp = [[0] * (len(str2) + 1) for i in range(len(str1) + 1)]
 
@@ -23,41 +23,38 @@ def long_common_subsequence(str1, str2):
             else:  # str1[r - 1] != str2[c - 1]
                 dp[r][c] = max(top, left)
 
-    valToPrint = []
+    # length of longest_common_subsequence is in dp[len(str1)[len(str2)]
+    # the code that follows backtracks through dp to find the letters that 
+    # make up the longest_common_subsequence
+    valToPrint = [""] * (dp[len(str1)][len(str2)] + 1)
+    index = len(valToPrint) - 1
+
     r = len(str1)
     c = len(str2)
-    while r >= 0 and c >= 0:
-        if str1[r - 1] == str2[c - 1]:
-            valToPrint.append(str1[r - 1])
-            r -= 1
-            c -= 1
-            continue
+    while r > 0 and c > 0:
         top = dp[r - 1][c]
         left = dp[r][c - 1]
-        diag = dp[r - 1][c - 1]
-        m = max(top, left, diag)
-        # if they are all equal, go to the diagonal
-        if top == diag and diag == left and top == left:
-            r -= 1
-            c -= 1
-        # otherwise go to the max of the three
-        elif m == top:
-            r -= 1
-        elif m == left:
-            c -= 1
-        elif m == diag:
-            r -= 1
-            c -= 1
 
-    i = len(valToPrint) - 1
-    while i >= 0:
-        print valToPrint[i]
-        i -= 1
+        if str1[r - 1] == str2[c - 1]:
+            valToPrint[index - 1] = str1[r - 1]
+            # go to the diagonal and update position of insertion for valToPrint
+            r -= 1;
+            c -= 1;
+            index -= 1
 
+        # go to the maximum of either the top or the left
+        elif left > top:
+            c -= 1
+        else:
+            r -= 1
+
+    print "LCS of " + str1 + " and " + str2 + " is " + "".join(valToPrint)
+
+    # return the length of longest_common_subsequence
     return dp[len(str1)][len(str2)]
 
 
 str1 = "Pycharm"
 str2 = "Python"
 
-print long_common_subsequence(str2.lower(), str1.lower())
+print longest_common_subsequence(str2.lower(), str1.lower())
