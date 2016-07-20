@@ -6,8 +6,11 @@ def longest_common_subsequence(str1, str2):
     for r in range(len(str1) + 1):
 
         for c in range(len(str2) + 1):
+            # value above dp[r][c] in dp 2d matrix
             top = dp[r - 1][c]
+            # value left of dp[r][c] in dp 2d matrix
             left = dp[r][c - 1]
+            # value diagonally across (top-left) from dp[r][c] in dp 2d matrix
             diag = dp[r - 1][c - 1]
 
             if r == 0 or c == 0:
@@ -32,7 +35,9 @@ def longest_common_subsequence(str1, str2):
     r = len(str1)
     c = len(str2)
     while r > 0 and c > 0:
+        # value above dp[r][c] in dp 2d matrix
         top = dp[r - 1][c]
+        # value left of dp[r][c] in dp 2d matrix
         left = dp[r][c - 1]
 
         if str1[r - 1] == str2[c - 1]:
