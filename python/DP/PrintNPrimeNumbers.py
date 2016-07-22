@@ -22,6 +22,7 @@ def print_first_n_prime_numbers(n):
             print i,
             # increment count since it keeps track of the number of prime numbers found
             count += 1
+        # increment to the next number we check for "primeness"
         i += 1
 
 
