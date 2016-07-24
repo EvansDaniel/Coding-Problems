@@ -448,8 +448,8 @@ protected:
         // enable ADL (not necessary in our case, but good practice)
         using std::swap;
 
-        // by swapping the members of two classes,
-        // the two classes are effectively swapped
+        // by swapping the members of two programs,
+        // the two programs are effectively swapped
         swap(first.root, second.root);
         swap(first.numNodes, second.numNodes);
     }
