@@ -2,11 +2,7 @@
 // Created by daniel on 6/21/16.
 //
 
-#include "../programs/DataStructures/BinarySearchTree.h"
-#include "../programs/DataStructures/BinarySearchTree.h"
-#include "../programs/DP/LongIncSub.h"
-#include <typeinfo>
-#include <zconf.h>
+#include "../programs/DataStructures/Graph.h"
 
 bool isPerfectSquare(int num) {
     if (num == 1) return true;
@@ -18,6 +14,11 @@ bool isPerfectSquare(int num) {
 }
 
 int main() {
-    int x[] = {1,2,3,4,5,6,7,8,9};
-    std::cout << longIncSub(x, 9);
+    Graph<int> graph;
+    graph.addEdge(1, 2);
+    graph.addEdge(3, 4);
+    graph.addEdge(3, 5);
+    graph.addEdge(5, 2);
+    graph.addEdge(5, 1);
+    graph.printGraph();
 };
