@@ -1,7 +1,8 @@
-import java.io.*;
-import java.util.*;
+package String_problems;
 
-public class FunnyString {
+import java.util.Scanner;
+
+public class FunnyStrings {
 
     public static void main(String[] args) {
       Scanner scan = new Scanner(System.in);
