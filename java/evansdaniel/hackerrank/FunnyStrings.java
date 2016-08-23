@@ -1,4 +1,4 @@
-package String_problems;
+package evansdaniel.hackerrank;
 
 import java.util.Scanner;
 
