@@ -1,4 +1,6 @@
-package evansdaniel.hackerrank;
+package evansdaniel.hackerrank.geometry;
+
+import evansdaniel.hackerrank.Config;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

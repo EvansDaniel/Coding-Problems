@@ -1,4 +1,4 @@
-package evansdaniel.hackerrank;
+package evansdaniel.hackerrank.strings;
 
 /**
  * Created by Daniel Evans on 4/2/2016.

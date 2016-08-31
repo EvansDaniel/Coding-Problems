@@ -1,4 +1,4 @@
-package evansdaniel.hackerrank;
+package evansdaniel.hackerrank.basic;
 
 /**
  * Created by daniel on 8/23/16.
@@ -6,6 +6,8 @@ package evansdaniel.hackerrank;
  * @author Daniel Evans
  * Question Prompt: https://www.hackerrank.com/contests/101hack40/challenges/designer-pdf-viewer
  */
+
+import evansdaniel.hackerrank.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;

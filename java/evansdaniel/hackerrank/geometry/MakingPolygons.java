@@ -1,4 +1,4 @@
-package evansdaniel.hackerrank;
+package evansdaniel.hackerrank.geometry;
 
 /**
  * Created by daniel on 8/24/16.
@@ -6,6 +6,8 @@ package evansdaniel.hackerrank;
  * @author Daniel Evans
  * Question Prompt: https://www.hackerrank.com/contests/w22/challenges/polygon-making
  */
+
+import evansdaniel.hackerrank.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;

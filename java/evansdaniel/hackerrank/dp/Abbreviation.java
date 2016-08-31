@@ -1,4 +1,6 @@
-package evansdaniel.hackerrank;
+package evansdaniel.hackerrank.dp;
+
+import evansdaniel.hackerrank.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -1,4 +1,4 @@
-package evansdaniel.hackerrank;
+package evansdaniel.hackerrank.strings;
 
 import java.util.Scanner;
 
