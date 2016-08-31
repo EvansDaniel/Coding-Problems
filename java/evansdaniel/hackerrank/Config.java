@@ -8,6 +8,6 @@ package evansdaniel.hackerrank;
 public class Config {
 
     public static String getDataDir() {
-        return System.getProperty("user.home") + "/proj/IdeaProjects/Coding-Problems/dataFiles/";
+        return System.getProperty("user.home") + "/IdeaProjects/Coding-Problems/dataFiles/";
     }
 }
