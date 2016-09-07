@@ -1,4 +1,6 @@
-package evansdaniel.hackerrank;
+package evansdaniel.hackerrank.math;
+
+import evansdaniel.hackerrank.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,7 +10,7 @@ import java.util.Scanner;
  * Created by daniel on 8/31/16.
  *
  * @author Daniel Evans
- *         Question Prompt: https://www.hackerrank.com/contests/world-codesprint-6/challenges/bonetrousle
+ * Question Prompt: https://www.hackerrank.com/contests/world-codesprint-6/challenges/bonetrousle
  */
 public class BoneTrousle {
 

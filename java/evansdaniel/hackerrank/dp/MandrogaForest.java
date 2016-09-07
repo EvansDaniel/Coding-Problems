@@ -1,4 +1,6 @@
-package evansdaniel.hackerrank;
+package evansdaniel.hackerrank.dp;
+
+import evansdaniel.hackerrank.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,7 +11,7 @@ import java.util.Scanner;
  * Created by daniel on 9/6/16.
  *
  * @author Daniel Evans
- *         Question Prompt: https://www.hackerrank.com/contests/hourrank-12/challenges/fair-cut
+ *         Question Prompt: https://www.hackerrank.com/challenges/mandragora
  */
 public class MandrogaForest {
 

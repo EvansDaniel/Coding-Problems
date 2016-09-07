@@ -1,4 +1,4 @@
-package evansdaniel;
+package evansdaniel.hackerrank.basic;
 
 import evansdaniel.hackerrank.Config;
 
@@ -10,7 +10,7 @@ import java.util.Scanner;
  * Created by daniel on 9/6/16.
  *
  * @author Daniel Evans
- *         Question Prompt: https://www.hackerrank.com/contests/hourrank-12/challenges/repeated-string
+ * Question Prompt: https://www.hackerrank.com/contests/hourrank-12/challenges/repeated-string
  */
 public class RepeatedString {
 
