@@ -24,14 +24,18 @@ public class MandrogaForest {
                 h[i] = s.nextInt();
             }
             Arrays.sort(h);
-            int ans = 0;
-            int p = 0;
+            long ans = 0, p = 0;
             for (int i : h) {
                 p += i;
             }
-            for (int i = 0; i < n; ++i) {
-                ans = Math.max(ans, p * (i + 1));
-                p -= h[i];
+            // strength increased every iteration to simulate
+            // eating the monster instead of battling it
+            for (int strength = 0; strength < n; ++strength) {
+                // answer keeps track of the max experience points of each n+1 possibilities
+                ans = Math.max(ans, p * (strength + 1));
+                // subtract the health b/c on next iteration we will
+                // assume we ate the monster not battled it
+                p -= h[strength];
             }
             System.out.println(ans);
         }
