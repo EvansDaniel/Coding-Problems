@@ -3,7 +3,7 @@
 #include <set>
 #include <fstream>
 #include <cmath>
-#include "../Config.h"
+#include "../../Config.h"
 
 /*
  * Author: Daniel Evans
@@ -59,18 +59,16 @@ std::vector<int> sieve(int n)
     return vec;
 }
 
+/*
 int main() {
 
     int tests, N, i, count, result;
-    std::ifstream redJohn;
-    redJohn.open(Config::getDataDir() + "RedJohnIsBack");
     std:: vector<int> prime;
     std::vector<int>::iterator it;
 
-    redJohn >> tests;
     prime = sieve(217286);
     int a[41];
-    for(i=0; i<4; i++)
+    for(i=1; i<4; i++)
         a[i] = 1;
     for(i=4; i<41;++i)
         a[i] = a[i-1] + a[i-4];
@@ -87,11 +85,14 @@ int main() {
         }
         numprime[i] = count; // keep track of num primes <= a[i]
     }
+    std::ifstream redJohnFile;
+    redJohnFile.open(Config::getDataDir() + "RedJohnIsBack");
+    redJohnFile >> tests;
     while(tests--)
     {
-        redJohn >> N;
+        redJohnFile >> N;
         result = numprime[N];
         std::cout << result << std::endl;
     }
     return 0;
-}
+}*/
