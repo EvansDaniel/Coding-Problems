@@ -14,9 +14,11 @@ int combinationSum4(vector<int>& nums, int target) {
     sort(sortedNums.begin(), sortedNums.end());
     vector<int> results(target + 1, 0);
     results[0] = 1;
-    for (int i = 1; i <= target; i++) {
-        for (int j =  0; j < sortedNums.size() && sortedNums[j] <= i; j++) {
-            results[i] += results[i - sortedNums[j]];
+    for (int currTarget = 1; currTarget <= target; currTarget++) {
+        for (int j =  0; j < sortedNums.size()
+                         &&  sortedNums[j] <= currTarget; j++)
+        {
+            results[currTarget] += results[currTarget - sortedNums[j]];
         }
     }
 
