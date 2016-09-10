@@ -11,9 +11,10 @@ bool isSubsequence(std::string s, std::string t) {
         if (t[j] == s[i] && ++i == s.length()) return true;
 }
 
+/*
 int main() {
     std::string s = "abc";
     std::string t = "ahbgdc";
 
     std::cout << isSubsequence(s, t) << std::endl;
-}
+}*/
