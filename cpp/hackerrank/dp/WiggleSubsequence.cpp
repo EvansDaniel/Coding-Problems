@@ -24,7 +24,10 @@ int wiggleMaxLength(vector<int> nums) {
         }
     return 1 + max(down[nums.size() - 1], up[nums.size() - 1]);
 }
-// O(n^2) solution w/ dynamic programming
+// O(n) solution w/ dynamic programming
+// could be optimized further by turning up and down into int vars
+// and using them to keep track of the max wiggle subsequence after
+// considering the ith element
 int wiggleMaxLen(vector<int>& nums) {
 
     if(nums.size() < 2)
