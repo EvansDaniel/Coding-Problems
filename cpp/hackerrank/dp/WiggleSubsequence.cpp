@@ -27,7 +27,8 @@ int wiggleMaxLength(vector<int> nums) {
 // O(n) solution w/ dynamic programming
 // could be optimized further by turning up and down into int vars
 // and using them to keep track of the max wiggle subsequence after
-// considering the ith element
+// considering the ith element. Answer to sub-problems might be useful so
+// they are lefy
 int wiggleMaxLen(vector<int>& nums) {
 
     if(nums.size() < 2)
@@ -54,8 +55,9 @@ int wiggleMaxLen(vector<int>& nums) {
     // return the biggest wiggle sequence of the whole aray
     return max(down[nums.size() - 1], up[nums.size() - 1]);
 }
-
+/*
 int main() {
     std::vector<int> v {1,7,4,9,2,5};
     std::cout << wiggleMaxLen(v);
 };
+*/
