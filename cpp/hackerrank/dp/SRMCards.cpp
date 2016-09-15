@@ -1,3 +1,6 @@
+// Author: Daniel Evans
+// Question Prompt: https://community.topcoder.com/stat?c=problem_statement&pm=11341
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -17,8 +20,9 @@ int maxTurns(vector<int> cards) {
     return c;
 }
 
+/*
 int main() {
     vector<int> v = {1, 4, 5, 7, 8, 9, 10};
     // expected output = 4
     cout << maxTurns(v);
-}
+}*/
