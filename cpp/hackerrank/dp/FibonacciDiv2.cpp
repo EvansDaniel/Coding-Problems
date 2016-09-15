@@ -20,7 +20,8 @@ int find(int n) {
     return min(n - dp[i - 1], dp[i] - n);
 }
 
+/*
 int main() {
 
     std::cout << find(12);
-};
+};*/
