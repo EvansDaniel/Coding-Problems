@@ -38,8 +38,8 @@ int calculate(int k, int n) {
 }
 
 
-int main() {
+/*int main() {
     cout << calculate(2, 3) << endl; // 10
     cout << calculate(4, 10) << endl; // 2002
     cout << calculate(10, 10) << endl; // 167960
-};
+};*/
