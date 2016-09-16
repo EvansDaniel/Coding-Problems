@@ -6,36 +6,37 @@
 using namespace std;
 
 int calculate(int k, int n) {
-    int dp[14][14];
 
-    for (int i = 0; i < 14; ++i) {
-        for (int j = 0; j < 14; ++j) {
-            dp[i][j] = 0;
+    int dp[k + 1][n + 1];
+
+    for (int r = 0; r < k + 1; ++r) {
+        for (int c = 0; c < n + 1; ++c) {
+            dp[r][c] = 0;
         }
     }
 
-    for (int i = 0; i < n + 1; ++i) {
-        dp[0][i] = 1;
+    for (int c = 0; c < n + 1; ++c) {
+        dp[0][c] = c + 1;
     }
-    for (int j = 0; j < n + 1; ++j) {
-        dp[j][0] = j + 1;
+    for (int r = 0; r < k + 1; ++r) {
+        dp[r][0] = 1;
     }
-
-    for (int i = 1; i < n + 1; ++i) {
-        for (int j = 1; j < k + 1; ++j) {
-            dp[i][j] = dp[i][j - 1] + dp[i - 1][j];
+    for (int r = 1; r < k + 1; ++r) {
+        for (int c = 1; c < n + 1; ++c) {
+            dp[r][c] = dp[r - 1][c] + dp[r][c - 1];
         }
     }
 
-
-/*
-     for (int i = 0; i < 14; ++i) {
-        for (int j = 0; j < 14; ++j)
+    // prints the array
+    /*for (int i = 0; i < k+1; ++i) {
+        for (int j = 0; j < n+1; ++j)
             cout << dp[i][j] << " ";
         cout << endl;
     }*/
-    return dp[n - 1][k];
+
+    return dp[k][n - 1];
 }
+
 
 int main() {
     cout << calculate(2, 3) << endl; // 10
