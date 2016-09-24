@@ -29,6 +29,7 @@ int find(string s) {
     return (int) s.size();
 }
 
+/*
 int main() {
     string temp = "abdfhdyrbdbsdfghjkllkjhgfds";
     cout << find(temp) << endl; // 38
@@ -37,4 +38,4 @@ int main() {
     temp = "abacaba";
     cout << find(temp) << endl; // 7
 
-}
+}*/
