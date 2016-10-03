@@ -25,6 +25,7 @@ public class DistinguishableSetDiv2 {
             c[i] = ans[i].toCharArray();
         }
         char[][] d = new char[np][nq];
+        // loops through the # of questions
         for (int i = 1; i < (1 << nq); i++) {
 
             HashSet<Integer> indexIntoString =
@@ -36,20 +37,28 @@ public class DistinguishableSetDiv2 {
             for (int j = 0; j < nq; j++) {
                 if ((i & (1 << j)) != 0) {
                     indexIntoString.add(j);
+                    System.out.println("j = " + j);
                     for (int k = 0; k < np; k++)
                         d[k][j] = c[k][j];
                 }
             }
+            System.out.println("index into string = " + indexIntoString);
             StringBuilder sb;
 
             for (int p = 0; p < np; p++) {
                 sb = new StringBuilder();
                 for (int x : indexIntoString)
                     sb.append(d[p][x]);
+                // duplicates won't be added, so if the some answers are
+                // the same, the # of answers in pplAnswers won't be
+                // equal to the number of
                 pplAnswers.add(sb.toString());
             }
-            if (pplAnswers.size() == np)
-                ds++;
+            System.out.println("Ppl answers = " + pplAnswers);
+            System.out.println("size of pplAnswers = " + pplAnswers.size() + " ?=? " + np);
+            if (pplAnswers.size() == np) {
+                System.out.println("Incrementing # distinguishable sets, ds = " + ++ds);
+            }
         }
         return ds;
     }
