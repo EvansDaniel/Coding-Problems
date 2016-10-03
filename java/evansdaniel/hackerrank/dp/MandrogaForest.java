@@ -19,6 +19,7 @@ public class MandrogaForest {
         Scanner s = new Scanner(new File(Config.getDataDir() + "MandrogaForest"));
 
         int tests = s.nextInt();
+
         while (tests-- > 0) {
             int n = s.nextInt();
             int[] h = new int[n];
